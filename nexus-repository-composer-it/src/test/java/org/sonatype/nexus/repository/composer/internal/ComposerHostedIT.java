@@ -68,11 +68,7 @@ public class ComposerHostedIT
 
   private static final String ZIPBALL_FILE_NAME = "rjkip-ftp-php-v1.1.0.zip";
 
-  private static final String COMPONENT_NAME = "ftp-php";
-
   private ComposerClient hostedClient;
-
-  private Repository hostedRepo;
 
   private Server server;
 
@@ -97,7 +93,7 @@ public class ComposerHostedIT
         .withBehaviours(Behaviours.file(testData.resolveFile(ZIPBALL_FILE_NAME)))
         .start();
 
-    hostedRepo = repos.createComposerHosted("composer-test-hosted");
+    Repository hostedRepo = repos.createComposerHosted("composer-test-hosted");
     hostedClient = composerClient(hostedRepo);
 
   }
