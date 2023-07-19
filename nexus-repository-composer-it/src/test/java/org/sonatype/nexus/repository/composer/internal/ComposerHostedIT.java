@@ -12,12 +12,6 @@
  */
 package org.sonatype.nexus.repository.composer.internal;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,23 +22,15 @@ import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 
 public class ComposerHostedIT
     extends ComposerITSupport
 {
-  private static final String FORMAT_NAME = "composer";
-
-  private static final String MIME_TYPE_JSON = "application/json";
-
-  private static final String MIME_TYPE_ZIP = "application/zip";
-
   private static final String NAME_VENDOR = "rjkip";
 
   private static final String NAME_PROJECT = "ftp-php";
@@ -63,8 +49,6 @@ public class ComposerHostedIT
 
   private static final String FILE_PACKAGES = NAME_PACKAGES + EXTENSION_JSON;
 
-  private static final String FILE_PACKAGES_CHANGED = NAME_PACKAGES + "-changed" + EXTENSION_JSON;
-
   private static final String FILE_LIST = NAME_LIST + EXTENSION_JSON;
 
   private static final String FILE_ZIPBALL = NAME_VENDOR + "-" + NAME_PROJECT + "-" + NAME_VERSION + EXTENSION_ZIP;
@@ -80,14 +64,11 @@ public class ComposerHostedIT
   private static final String VALID_LIST_URL = LIST_BASE_PATH + FILE_LIST;
 
   private static final String VALID_ZIPBALL_URL = NAME_VENDOR + "/" + NAME_PROJECT + "/" + NAME_VERSION + "/" + FILE_ZIPBALL;
+  private static final String VALID_ZIPBALL_BASE_URL = NAME_VENDOR + "/" + NAME_PROJECT + "/" + NAME_VERSION;
 
   private static final String ZIPBALL_FILE_NAME = "rjkip-ftp-php-v1.1.0.zip";
 
   private static final String COMPONENT_NAME = "ftp-php";
-
-  private static final String PACKAGE_NAME = COMPONENT_NAME + EXTENSION_JSON;
-
-  private static final String VALID_PACKAGE_URL = PACKAGE_BASE_PATH + PACKAGE_NAME;
 
   private ComposerClient hostedClient;
 
@@ -118,53 +99,20 @@ public class ComposerHostedIT
 
     hostedRepo = repos.createComposerHosted("composer-test-hosted");
     hostedClient = composerClient(hostedRepo);
+
   }
 
   @Test
-  public void unresponsiveRemoteProduces404() throws Exception {
+  public void nonExistingPackageProduces404() throws Exception {
     assertThat(status(hostedClient.get(BAD_PATH)), is(HttpStatus.NOT_FOUND));
   }
 
-  public void retrievePackagesJSONFromProxyWhenRemoteOnline() throws Exception {
-    assertThat(status(hostedClient.get(FILE_PACKAGES)), is(HttpStatus.OK));
-
-    final Asset asset = findAsset(hostedRepo, FILE_PACKAGES);
-    assertThat(asset.name(), is(equalTo(FILE_PACKAGES)));
-    assertThat(asset.contentType(), is(equalTo(MIME_TYPE_JSON)));
-    assertThat(asset.format(), is(equalTo(FORMAT_NAME)));
-  }
-
   @Test
-  public void providersURLChangedToNXRM() throws Exception {
-    assertThat(status(hostedClient.get(FILE_PACKAGES)), is(HttpStatus.OK));
-
-    try (CloseableHttpResponse response = hostedClient.get(FILE_PACKAGES)) {
-      HttpEntity entity = response.getEntity();
-      JsonElement element = new JsonParser().parse(IOUtils.toString(entity.getContent()));
-      JsonObject json = element.getAsJsonObject();
-
-      assertThat(json.get("providers-url").toString(), is(equalTo("\"http://localhost:10000/repository/composer-test-hosted/p/%package%.json\"")));
-    }
+  public void putAndGetOk() throws Exception {
+    assertThat(hostedClient.put("packages/upload/" + VALID_ZIPBALL_BASE_URL, testData.resolveFile(ZIPBALL_FILE_NAME)), is(200));
+    assertThat(status(hostedClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.OK));
   }
 
-  public void retrieveListJSONFromProxyWhenRemoteOnline() throws Exception {
-    assertThat(status(hostedClient.get(VALID_LIST_URL)), is(HttpStatus.OK));
-
-    final Asset asset = findAsset(hostedRepo, FILE_LIST);
-    assertThat(asset.name(), is(equalTo(FILE_LIST)));
-    assertThat(asset.contentType(), is(equalTo(MIME_TYPE_JSON)));
-    assertThat(asset.format(), is(equalTo(FORMAT_NAME)));
-  }
-
-  @Test
-  public void retrieveProviderJSONFromHosted() throws Exception {
-    assertThat(status(hostedClient.get(VALID_PROVIDER_URL)), is(HttpStatus.OK));
-
-    final Asset asset = findAsset(hostedRepo, VALID_PROVIDER_URL);
-    assertThat(asset.name(), is(equalTo(VALID_PROVIDER_URL)));
-    assertThat(asset.contentType(), is(equalTo(MIME_TYPE_JSON)));
-    assertThat(asset.format(), is(equalTo(FORMAT_NAME)));
-  }
 
   @After
   public void tearDown() throws Exception {
