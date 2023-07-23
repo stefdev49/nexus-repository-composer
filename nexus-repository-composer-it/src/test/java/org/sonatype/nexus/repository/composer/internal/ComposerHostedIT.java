@@ -92,9 +92,4 @@ public class ComposerHostedIT
     int code = hostedClient.put("/service/rest/v1/repositories/composer/hosted/" + COMPOSER_TEST_HOSTED, jsonConfig.toString());
     assertThat(code, is(HttpStatus.NO_CONTENT));
   }
-
-  @After
-  public void tearDown() throws Exception {
-    server.stop();
-  }
 }

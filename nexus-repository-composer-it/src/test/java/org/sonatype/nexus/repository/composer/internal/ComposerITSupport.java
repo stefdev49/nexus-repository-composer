@@ -48,9 +48,11 @@ abstract public class ComposerITSupport
 
   protected static final String NAME_PACKAGES = "packages";
 
+  protected static final String EXTENSION_ZIP = ".zip";
+
   protected static final String VALID_ZIPBALL_BASE_URL = NAME_VENDOR + "/" + NAME_PROJECT + "/" + NAME_VERSION;
 
-  protected static final String FILE_ZIPBALL = NAME_VENDOR + "-" + NAME_PROJECT;
+  protected static final String FILE_ZIPBALL = NAME_VENDOR + "-" + NAME_PROJECT + "-" + NAME_VERSION + EXTENSION_ZIP;
 
   protected static final String VALID_ZIPBALL_URL = VALID_ZIPBALL_BASE_URL + "/" + FILE_ZIPBALL;
 
@@ -71,8 +73,6 @@ abstract public class ComposerITSupport
   protected static final String VALID_PROVIDER_URL = PACKAGE_BASE_PATH + FILE_PROVIDER;
 
   protected static final String VALID_LIST_URL = LIST_BASE_PATH + FILE_LIST;
-
-  protected static final String EXTENSION_ZIP = ".zip";
 
   protected static final String MIME_TYPE_JSON = "application/json";
 

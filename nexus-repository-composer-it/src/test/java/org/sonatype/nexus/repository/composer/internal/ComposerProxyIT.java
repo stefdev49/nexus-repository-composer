@@ -146,5 +146,4 @@ public class ComposerProxyIT
     int code = proxyClient.put("/service/rest/v1/repositories/composer/proxy/" + COMPOSER_TEST_PROXY, jsonConfig.toString());
     assertThat(code, is(HttpStatus.NO_CONTENT));
   }
-
 }
