@@ -16,6 +16,11 @@ import java.net.URL;
 
 import javax.annotation.Nonnull;
 
+import org.junit.After;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
+import org.sonatype.goodies.httpfixture.server.fluent.Behaviours;
+import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.composer.internal.fixtures.RepositoryRuleComposer;
@@ -23,6 +28,7 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 
 import org.junit.Rule;
@@ -32,8 +38,49 @@ import static com.google.common.base.Preconditions.checkNotNull;
 abstract public class ComposerITSupport
     extends RepositoryITSupport
 {
+  protected static final String ZIPBALL_FILE_NAME = "rjkip-ftp-php-v1.1.0.zip";
+
+  protected static final String NAME_VENDOR = "rjkip";
+
+  protected static final String NAME_PROJECT = "ftp-php";
+
+  protected static final String NAME_VERSION = "v1.1.0";
+
+  protected static final String NAME_PACKAGES = "packages";
+
+  protected static final String VALID_ZIPBALL_BASE_URL = NAME_VENDOR + "/" + NAME_PROJECT + "/" + NAME_VERSION;
+
+  protected static final String FILE_ZIPBALL = NAME_VENDOR + "-" + NAME_PROJECT;
+
+  protected static final String VALID_ZIPBALL_URL = VALID_ZIPBALL_BASE_URL + "/" + FILE_ZIPBALL;
+
+  protected static final String NAME_LIST = "list";
+
+  protected static final String EXTENSION_JSON = ".json";
+
+  protected static final String FILE_PROVIDER = NAME_PROJECT + EXTENSION_JSON;
+
+  protected static final String FILE_PACKAGES = NAME_PACKAGES + EXTENSION_JSON;
+
+  protected static final String FILE_LIST = NAME_LIST + EXTENSION_JSON;
+
+  protected static final String PACKAGE_BASE_PATH = "p/" + NAME_VENDOR + "/";
+
+  protected static final String LIST_BASE_PATH = "packages/";
+
+  protected static final String VALID_PROVIDER_URL = PACKAGE_BASE_PATH + FILE_PROVIDER;
+
+  protected static final String VALID_LIST_URL = LIST_BASE_PATH + FILE_LIST;
+
+  protected static final String EXTENSION_ZIP = ".zip";
+
+  protected static final String MIME_TYPE_JSON = "application/json";
+
+  protected static final String MIME_TYPE_ZIP = "application/zip";
+
   @Rule
   public RepositoryRuleComposer repos = new RepositoryRuleComposer(() -> repositoryManager);
+  protected Server server;
 
   @Override
   protected RepositoryRuleComposer createRepositoryRule() {
@@ -67,5 +114,31 @@ abstract public class ComposerITSupport
 
   protected static StorageTx getStorageTx(final Repository repository) {
     return repository.facet(StorageFacet.class).txSupplier().get();
+  }
+
+  @Configuration
+  public static Option[] configureNexus() {
+    return NexusPaxExamSupport.options(
+        NexusITSupport.configureNexusBase(),
+        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-composer")
+    );
+  }
+
+  protected void startServer() throws Exception {
+    server = Server.withPort(0)
+        .serve("/" + FILE_PACKAGES)
+        .withBehaviours(Behaviours.file(testData.resolveFile(FILE_PACKAGES)))
+        .serve("/" + VALID_LIST_URL)
+        .withBehaviours(Behaviours.file(testData.resolveFile(FILE_LIST)))
+        .serve("/" + VALID_PROVIDER_URL)
+        .withBehaviours(Behaviours.file(testData.resolveFile(FILE_PROVIDER)))
+        .serve("/" + VALID_ZIPBALL_URL)
+        .withBehaviours(Behaviours.file(testData.resolveFile(ZIPBALL_FILE_NAME)))
+        .start();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    server.stop();
   }
 }
