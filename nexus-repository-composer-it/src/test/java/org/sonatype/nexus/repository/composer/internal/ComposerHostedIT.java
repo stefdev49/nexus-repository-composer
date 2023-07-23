@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.composer.internal;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.repository.Repository;
