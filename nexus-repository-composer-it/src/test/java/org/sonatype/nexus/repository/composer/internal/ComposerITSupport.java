@@ -16,7 +16,6 @@ import java.net.URL;
 
 import javax.annotation.Nonnull;
 
-import org.junit.Ignore;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.composer.internal.fixtures.RepositoryRuleComposer;
