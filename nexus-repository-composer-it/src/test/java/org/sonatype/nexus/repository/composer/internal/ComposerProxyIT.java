@@ -12,6 +12,17 @@
  */
 package org.sonatype.nexus.repository.composer.internal;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
 import org.sonatype.goodies.httpfixture.server.fluent.Behaviours;
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
@@ -20,23 +31,10 @@ import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
+import static org.testcontainers.shaded.org.hamcrest.text.MatchesPattern.matchesPattern;
 
 public class ComposerProxyIT
     extends ComposerITSupport
@@ -127,6 +125,7 @@ public class ComposerProxyIT
     assertThat(status(proxyClient.get(BAD_PATH)), is(HttpStatus.NOT_FOUND));
   }
 
+  @Test
   public void retrievePackagesJSONFromProxyWhenRemoteOnline() throws Exception {
     assertThat(status(proxyClient.get(FILE_PACKAGES)), is(HttpStatus.OK));
 
@@ -144,8 +143,7 @@ public class ComposerProxyIT
       HttpEntity entity = response.getEntity();
       JsonElement element = new JsonParser().parse(IOUtils.toString(entity.getContent()));
       JsonObject json = element.getAsJsonObject();
-
-      assertThat(json.get("providers-url").toString(), is(equalTo("\"http://localhost:10000/repository/composer-test-proxy/p/%package%.json\"")));
+      assertThat(matchesPattern("http://localhost:[0-9]*/repository/composer-test-proxy/p/%package%.json").matches(json.get("providers-url").getAsString()), is(true));
     }
   }
 
