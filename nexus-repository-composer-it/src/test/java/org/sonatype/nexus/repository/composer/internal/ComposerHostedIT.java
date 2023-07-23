@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.composer.internal;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,8 +127,13 @@ public class ComposerHostedIT
   }
 
   @Test
+  public void badPutHostedConfigurationByAPI() throws Exception {
+    assertThat(hostedClient.put("/service/rest/v1/repositories/composer/proxy/" + COMPOSER_TEST_HOSTED, "bad request"), is(HttpStatus.BAD_REQUEST));
+  }
+
+  @Test
   public void getHostedConfigurationByAPI() throws Exception {
-    org.apache.http.client.methods.CloseableHttpResponse response = hostedClient.get("/service/rest/v1/repositories/composer/hosted/" + COMPOSER_TEST_HOSTED);
+    CloseableHttpResponse response = hostedClient.get("/service/rest/v1/repositories/composer/hosted/" + COMPOSER_TEST_HOSTED);
     assertThat(status(response), is(HttpStatus.OK));
     String config = new String(bytes(response));
     // convert to json and check some values
@@ -138,6 +144,12 @@ public class ComposerHostedIT
     // compare ignoring url field
     jsonConfig.remove("url");
     assertThat(jsonConfig, is(expected));
+
+    // set online to false, then update repository
+    jsonConfig.remove("online");
+    jsonConfig.addProperty("online", false);
+    int code = hostedClient.put("/service/rest/v1/repositories/composer/hosted/" + COMPOSER_TEST_HOSTED, jsonConfig.toString());
+    assertThat(code, is(HttpStatus.NO_CONTENT));
   }
 
   @After

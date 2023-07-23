@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.composer.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
 import org.apache.http.entity.ContentType;
@@ -41,6 +42,14 @@ public class ComposerClient
 
     HttpPut put = new HttpPut(repositoryBaseUri.resolve(path));
     put.setEntity(EntityBuilder.create().setContentType(ContentType.parse("application/zip")).setFile(file).build());
+    return status(execute(put));
+  }
+
+  public int put(String path, String string) throws IOException {
+    checkNotNull(path);
+    checkNotNull(string);
+    HttpPut put = new HttpPut(repositoryBaseUri.resolve(path));
+    put.setEntity(EntityBuilder.create().setContentType(ContentType.parse("application/json")).setText(string).build());
     return status(execute(put));
   }
 }
