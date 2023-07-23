@@ -33,6 +33,7 @@ import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 import static org.testcontainers.shaded.org.hamcrest.text.MatchesPattern.matchesPattern;
 
@@ -88,6 +89,7 @@ public class ComposerProxyIT
   private static final String PACKAGE_NAME = COMPONENT_NAME + EXTENSION_JSON;
 
   private static final String VALID_PACKAGE_URL = PACKAGE_BASE_PATH + PACKAGE_NAME;
+  public static final String COMPOSER_TEST_PROXY = "composer-test-proxy";
 
   private ComposerClient proxyClient;
 
@@ -116,7 +118,7 @@ public class ComposerProxyIT
         .withBehaviours(Behaviours.file(testData.resolveFile(ZIPBALL_FILE_NAME)))
         .start();
 
-    proxyRepo = repos.createComposerProxy("composer-test-proxy", server.getUrl().toExternalForm());
+    proxyRepo = repos.createComposerProxy(COMPOSER_TEST_PROXY, server.getUrl().toExternalForm());
     proxyClient = composerClient(proxyRepo);
   }
 
@@ -176,7 +178,28 @@ public class ComposerProxyIT
   //  assertThat(asset.contentType(), is(equalTo(MIME_TYPE_ZIP)));
   //  assertThat(asset.format(), is(equalTo(FORMAT_NAME)));
   //}
-  
+
+  @Test
+  public void checkRestAPI() throws Exception {
+    assertThat(status(proxyClient.get("/service/rest/v1/repositories")), is(HttpStatus.OK));
+  }
+
+  @Test
+  public void getProxyConfigurationByAPI() throws Exception {
+    org.apache.http.client.methods.CloseableHttpResponse response = proxyClient.get("/service/rest/v1/repositories/composer/proxy/" + COMPOSER_TEST_PROXY);
+    assertThat(status(response), is(HttpStatus.OK));
+    String config = new String(bytes(response));
+    // convert to json and check some values
+    JsonObject jsonConfig = (JsonObject) new JsonParser().parse(config);
+    int port = server.getPort();
+    JsonObject expected = new JsonParser().parse("{\"name\":\"composer-test-proxy\",\"format\":\"composer\",\"online\":true,\"storage\":{\"blobStoreName\":\"default\",\"strictContentTypeValidation\":true},\"cleanup\":null,\"proxy\":{\"remoteUrl\":\"http://localhost:" + port + "\",\"contentMaxAge\":1440,\"metadataMaxAge\":1440},\"negativeCache\":{\"enabled\":true,\"timeToLive\":1440},\"httpClient\":{\"blocked\":false,\"autoBlock\":false,\"connection\":{\"retries\":null,\"userAgentSuffix\":null,\"timeout\":null,\"enableCircularRedirects\":false,\"enableCookies\":false,\"useTrustStore\":false},\"authentication\":null},\"routingRuleName\":null,\"type\":\"proxy\"}").getAsJsonObject();
+    // check url field matches http://localhost:[0-9]*/repository/composer-test-proxy
+    assertThat(matchesPattern("http://localhost:[0-9]*/repository/" + COMPOSER_TEST_PROXY).matches(jsonConfig.get("url").getAsString()), is(true));
+    // compare ignoring url field
+    jsonConfig.remove("url");
+    assertThat(jsonConfig, is(expected));
+  }
+
   @After
   public void tearDown() throws Exception {
     server.stop();

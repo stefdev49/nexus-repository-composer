@@ -34,6 +34,7 @@ public class ComposerClient
   {
     super(httpClient, httpClientContext, repositoryBaseUri);
   }
+
   public int put(final String path, final File file) throws Exception {
     checkNotNull(path);
     checkNotNull(file);

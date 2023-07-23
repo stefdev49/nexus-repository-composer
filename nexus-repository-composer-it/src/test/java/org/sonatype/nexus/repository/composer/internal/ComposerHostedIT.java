@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.composer.internal;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +28,9 @@ import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
+import static org.testcontainers.shaded.org.hamcrest.text.MatchesPattern.matchesPattern;
 
 public class ComposerHostedIT
     extends ComposerITSupport
@@ -67,6 +71,7 @@ public class ComposerHostedIT
   private static final String VALID_ZIPBALL_URL = VALID_ZIPBALL_BASE_URL + "/" + FILE_ZIPBALL;
 
   private static final String ZIPBALL_FILE_NAME = "rjkip-ftp-php-v1.1.0.zip";
+  public static final String COMPOSER_TEST_HOSTED = "composer-test-hosted";
 
   private ComposerClient hostedClient;
 
@@ -93,7 +98,7 @@ public class ComposerHostedIT
         .withBehaviours(Behaviours.file(testData.resolveFile(ZIPBALL_FILE_NAME)))
         .start();
 
-    Repository hostedRepo = repos.createComposerHosted("composer-test-hosted");
+    Repository hostedRepo = repos.createComposerHosted(COMPOSER_TEST_HOSTED);
     hostedClient = composerClient(hostedRepo);
 
   }
@@ -115,6 +120,25 @@ public class ComposerHostedIT
     assertThat(status(hostedClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.OK));
   }
 
+  @Test
+  public void checkRestAPI() throws Exception {
+    assertThat(status(hostedClient.get("/service/rest/v1/repositories")), is(HttpStatus.OK));
+  }
+
+  @Test
+  public void getHostedConfigurationByAPI() throws Exception {
+    org.apache.http.client.methods.CloseableHttpResponse response = hostedClient.get("/service/rest/v1/repositories/composer/hosted/" + COMPOSER_TEST_HOSTED);
+    assertThat(status(response), is(HttpStatus.OK));
+    String config = new String(bytes(response));
+    // convert to json and check some values
+    JsonObject jsonConfig = (JsonObject) new JsonParser().parse(config);
+    JsonObject expected = new JsonParser().parse("{\"name\":\"composer-test-hosted\",\"format\":\"composer\",\"online\":true,\"storage\":{\"blobStoreName\":\"default\",\"strictContentTypeValidation\":true,\"writePolicy\":\"ALLOW\"},\"cleanup\":null,\"component\":{\"proprietaryComponents\":false},\"type\":\"hosted\"}").getAsJsonObject();
+    // check url field matches http://localhost:[0-9]*/repository/composer-test-hosted
+    assertThat(matchesPattern("http://localhost:[0-9]*/repository/" + COMPOSER_TEST_HOSTED).matches(jsonConfig.get("url").getAsString()), is(true));
+    // compare ignoring url field
+    jsonConfig.remove("url");
+    assertThat(jsonConfig, is(expected));
+  }
 
   @After
   public void tearDown() throws Exception {
