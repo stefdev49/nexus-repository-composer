@@ -63,8 +63,8 @@ public class ComposerHostedIT
 
   private static final String VALID_LIST_URL = LIST_BASE_PATH + FILE_LIST;
 
-  private static final String VALID_ZIPBALL_URL = NAME_VENDOR + "/" + NAME_PROJECT + "/" + NAME_VERSION + "/" + FILE_ZIPBALL;
   private static final String VALID_ZIPBALL_BASE_URL = NAME_VENDOR + "/" + NAME_PROJECT + "/" + NAME_VERSION;
+  private static final String VALID_ZIPBALL_URL = VALID_ZIPBALL_BASE_URL + "/" + FILE_ZIPBALL;
 
   private static final String ZIPBALL_FILE_NAME = "rjkip-ftp-php-v1.1.0.zip";
 
@@ -105,7 +105,13 @@ public class ComposerHostedIT
 
   @Test
   public void putAndGetOk() throws Exception {
-    assertThat(hostedClient.put("packages/upload/" + VALID_ZIPBALL_BASE_URL, testData.resolveFile(ZIPBALL_FILE_NAME)), is(200));
+    // given
+    assertThat(status(hostedClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.NOT_FOUND));
+
+    // when
+    assertThat(hostedClient.put(NAME_PACKAGES + "/upload/" + VALID_ZIPBALL_BASE_URL, testData.resolveFile(ZIPBALL_FILE_NAME)), is(200));
+
+    // then
     assertThat(status(hostedClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.OK));
   }
 
