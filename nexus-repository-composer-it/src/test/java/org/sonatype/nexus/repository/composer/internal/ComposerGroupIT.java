@@ -23,10 +23,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 
-public class ComposerHostedIT
+public class ComposerGroupIT
     extends ComposerITSupport
 {
+  private static final String COMPOSER_TEST_GROUP = "composer-test-group";
+
   private static final String COMPOSER_TEST_HOSTED = "composer-test-hosted";
+
+  private ComposerClient groupClient;
 
   private ComposerClient hostedClient;
 
@@ -34,40 +38,42 @@ public class ComposerHostedIT
   public void setup() throws Exception {
     startServer();
 
-    Repository hostedRepo = repos.createComposerHosted(COMPOSER_TEST_HOSTED);
-    hostedClient = composerClient(hostedRepo);
+
+    hostedClient= composerClient(repos.createComposerHosted(COMPOSER_TEST_HOSTED));
+    Repository groupRepo = repos.createComposerGroup(COMPOSER_TEST_GROUP, COMPOSER_TEST_HOSTED);
+    groupClient = composerClient(groupRepo);
   }
 
   @Test
   public void nonExistingPackageProduces404() throws Exception {
-    assertThat(status(hostedClient.get(BAD_PATH)), is(HttpStatus.NOT_FOUND));
+    assertThat(status(groupClient.get(BAD_PATH)), is(HttpStatus.NOT_FOUND));
   }
 
   @Test
   public void putAndGetOk() throws Exception {
-    // given
-    assertThat(status(hostedClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.NOT_FOUND));
+    // given : check package not exists
+    assertThat(status(groupClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.NOT_FOUND));
 
-    // when
+    // when : upload package on hosted
     assertThat(hostedClient.put(NAME_PACKAGES + "/upload/" + VALID_ZIPBALL_BASE_URL, testData.resolveFile(ZIPBALL_FILE_NAME)), is(200));
 
-    // then
-    assertThat(status(hostedClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.OK));
+    // then : download on group
+    assertThat(status(groupClient.get(VALID_ZIPBALL_URL)), is(HttpStatus.OK));
   }
 
   @Test
   public void checkRestAPI() throws Exception {
-    assertThat(status(hostedClient.get("/service/rest/v1/repositories")), is(HttpStatus.OK));
+    assertThat(status(groupClient.get("/service/rest/v1/repositories")), is(HttpStatus.OK));
   }
 
   @Test
-  public void badPutHostedConfigurationByAPI() throws Exception {
-    assertThat(hostedClient.put("/service/rest/v1/repositories/composer/hosted/" + COMPOSER_TEST_HOSTED, "bad request"), is(HttpStatus.BAD_REQUEST));
+  public void badPutGroupConfigurationByAPI() throws Exception {
+    assertThat(groupClient.put("/service/rest/v1/repositories/composer/group/" + COMPOSER_TEST_GROUP, "bad request"), is(HttpStatus.BAD_REQUEST));
   }
 
   @Test
-  public void getAndUpdateHostedConfigurationByAPI() throws Exception {
-    JsonObject expected = new JsonParser().parse("{\"name\":\"composer-test-hosted\",\"format\":\"composer\",\"online\":true,\"storage\":{\"blobStoreName\":\"default\",\"strictContentTypeValidation\":true,\"writePolicy\":\"ALLOW\"},\"cleanup\":null,\"component\":{\"proprietaryComponents\":false},\"type\":\"hosted\"}").getAsJsonObject();
-    getAndUpdateConfig(expected, COMPOSER_TEST_HOSTED, "hosted", hostedClient);
+  public void getAndUpdateGroupConfigurationByAPI() throws Exception {
+    JsonObject expected = new JsonParser().parse("{\"name\":\"composer-test-group\",\"format\":\"composer\",\"online\":true,\"storage\":{\"blobStoreName\":\"default\",\"strictContentTypeValidation\":true},\"group\":{\"memberNames\":[\"composer-test-hosted\"],\"writableMember\":\"None\"},\"type\":\"group\"}").getAsJsonObject();
+    getAndUpdateConfig(expected, COMPOSER_TEST_GROUP, "group", groupClient);
   }
 }

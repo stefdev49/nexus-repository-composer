@@ -12,10 +12,14 @@
  */
 package org.sonatype.nexus.repository.composer.internal;
 
+import java.io.IOException;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -24,6 +28,7 @@ import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.composer.internal.fixtures.RepositoryRuleComposer;
+import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -34,6 +39,11 @@ import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.bytes;
+import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
+import static org.testcontainers.shaded.org.hamcrest.text.MatchesPattern.matchesPattern;
 
 abstract public class ComposerITSupport
     extends RepositoryITSupport
@@ -77,6 +87,7 @@ abstract public class ComposerITSupport
   protected static final String MIME_TYPE_JSON = "application/json";
 
   protected static final String MIME_TYPE_ZIP = "application/zip";
+  protected static final String BAD_PATH = "/this/path/is/not/valid";
 
   @Rule
   public RepositoryRuleComposer repos = new RepositoryRuleComposer(() -> repositoryManager);
@@ -140,5 +151,27 @@ abstract public class ComposerITSupport
   @After
   public void tearDown() throws Exception {
     server.stop();
+  }
+
+  protected void getAndUpdateConfig(JsonObject expected, String repoName, String repoType, ComposerClient repoClient) throws IOException {
+    // when
+    CloseableHttpResponse response = repoClient.get("/service/rest/v1/repositories/composer/"+ repoType + "/" + repoName);
+    String config = new String(bytes(response));
+    JsonObject jsonConfig = (JsonObject) new JsonParser().parse(config);
+
+    // then
+    assertThat(status(response), is(HttpStatus.OK));
+    // check url field matches http://localhost:[0-9]*/repository/composer-test-<name>
+    assertThat(matchesPattern("http://localhost:[0-9]*/repository/" + repoName).matches(jsonConfig.get("url").getAsString()), is(true));
+    // compare ignoring url field
+    jsonConfig.remove("url");
+    assertThat(jsonConfig, is(expected));
+
+    // set online to false, remove optional connection properties, then update repository
+    jsonConfig.remove("online");
+    jsonConfig.remove("connection");
+    jsonConfig.addProperty("online", false);
+    int code = repoClient.put("/service/rest/v1/repositories/composer/"+ repoType + "/" + repoName, jsonConfig.toString());
+    assertThat(code, is(HttpStatus.NO_CONTENT));
   }
 }

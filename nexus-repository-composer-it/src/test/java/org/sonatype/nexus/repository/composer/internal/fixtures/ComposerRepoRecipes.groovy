@@ -43,5 +43,11 @@ trait ComposerRepoRecipes
     createRepository(createHosted(name, 'composer-hosted'))
   }
 
+  @Nonnull
+  Repository createComposerGroup(final String name, final String... members)
+  {
+    createRepository(createGroup(name, 'composer-group', members))
+  }
+
   abstract Repository createRepository(final Configuration configuration)
 }

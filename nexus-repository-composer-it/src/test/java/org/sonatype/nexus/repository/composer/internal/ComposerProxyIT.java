@@ -26,7 +26,6 @@ import org.sonatype.nexus.repository.storage.Asset;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 import static org.testcontainers.shaded.org.hamcrest.text.MatchesPattern.matchesPattern;
 
@@ -35,11 +34,7 @@ public class ComposerProxyIT
 {
   private static final String FORMAT_NAME = "composer";
 
-  private static final String FILE_PACKAGES = NAME_PACKAGES + EXTENSION_JSON;
-
-  private static final String BAD_PATH = "/this/path/is/not/valid";
-
-  public static final String COMPOSER_TEST_PROXY = "composer-test-proxy";
+  private static final String COMPOSER_TEST_PROXY = "composer-test-proxy";
 
   private ComposerClient proxyClient;
 
@@ -121,29 +116,12 @@ public class ComposerProxyIT
   }
 
   @Test
-  public void getAndPutProxyConfigurationByAPI() throws Exception {
+  public void getAndUpdateProxyConfigurationByAPI() throws Exception {
     // given
     int port = server.getPort();
     JsonObject expected = new JsonParser().parse("{\"name\":\"composer-test-proxy\",\"format\":\"composer\",\"online\":true,\"storage\":{\"blobStoreName\":\"default\",\"strictContentTypeValidation\":true},\"cleanup\":null,\"proxy\":{\"remoteUrl\":\"http://localhost:" + port + "\",\"contentMaxAge\":1440,\"metadataMaxAge\":1440},\"negativeCache\":{\"enabled\":true,\"timeToLive\":1440},\"httpClient\":{\"blocked\":false,\"autoBlock\":false,\"connection\":{\"retries\":null,\"userAgentSuffix\":null,\"timeout\":null,\"enableCircularRedirects\":false,\"enableCookies\":false,\"useTrustStore\":false},\"authentication\":null},\"routingRuleName\":null,\"type\":\"proxy\"}").getAsJsonObject();
 
-    // when
-    CloseableHttpResponse response = proxyClient.get("/service/rest/v1/repositories/composer/proxy/" + COMPOSER_TEST_PROXY);
-    String config = new String(bytes(response));
-    JsonObject jsonConfig = (JsonObject) new JsonParser().parse(config);
-
-    // then
-    assertThat(status(response), is(HttpStatus.OK));
-    // check url field matches http://localhost:[0-9]*/repository/composer-test-proxy
-    assertThat(matchesPattern("http://localhost:[0-9]*/repository/" + COMPOSER_TEST_PROXY).matches(jsonConfig.get("url").getAsString()), is(true));
-    // compare ignoring url field
-    jsonConfig.remove("url");
-    assertThat(jsonConfig, is(expected));
-
-    // set online to false, remove optional connection properties, then update repository
-    jsonConfig.remove("online");
-    jsonConfig.remove("connection");
-    jsonConfig.addProperty("online", false);
-    int code = proxyClient.put("/service/rest/v1/repositories/composer/proxy/" + COMPOSER_TEST_PROXY, jsonConfig.toString());
-    assertThat(code, is(HttpStatus.NO_CONTENT));
+    getAndUpdateConfig(expected, COMPOSER_TEST_PROXY, "proxy", proxyClient);
   }
+
 }
