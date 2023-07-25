@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.composer.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.importtask.ImportFileConfiguration;
 import org.sonatype.nexus.repository.rest.UploadDefinitionExtension;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.VariableResolverAdapter;
@@ -70,7 +68,7 @@ public abstract class ComposerUploadHandlerSupport
 
   protected UploadDefinition definition;
 
-  public ComposerUploadHandlerSupport(
+  protected ComposerUploadHandlerSupport(
       final ContentPermissionChecker contentPermissionChecker,
       final VariableResolverAdapter variableResolverAdapter,
       final Set<UploadDefinitionExtension> uploadDefinitionExtensions,
@@ -85,21 +83,10 @@ public abstract class ComposerUploadHandlerSupport
   @Override
   public UploadResponse handle(final Repository repository, final ComponentUpload upload) throws IOException {
     log.info("Handling component upload for repository {}", repository.getName());
-    // log all the fields
-    for (Map.Entry<String, String> entry : upload.getFields().entrySet()) {
-      log.info("ComponentUpload field: {} = {}", entry.getKey(), entry.getValue());
-    }
+
     String vendor = upload.getFields().get(GROUP).trim();
     String name = upload.getFields().get(NAME).trim();
     String version = upload.getFields().get(VERSION).trim();
-
-    // log all the assets
-    for (AssetUpload asset : upload.getAssetUploads()) {
-      log.info("AssetUpload asset = {}", asset);
-      for (Map.Entry<String, String> entry : asset.getFields().entrySet()) {
-        log.info("AssetUpload field: {} = {}", entry.getKey(), entry.getValue());
-      }
-    }
     String basePath = upload.getFields().get(GROUP).trim();
 
     //Data holders for populating the UploadResponse
@@ -123,26 +110,6 @@ public abstract class ComposerUploadHandlerSupport
                                                        final Map<String, PartPayload> pathToPayload)
       throws IOException;
 
-  @Override
-  public Content handle(
-      final Repository repository,
-      final File content,
-      final String path)
-      throws IOException
-  {
-    // TODO: Remove this handler once all formats have been converted to work with ImportFileConfiguration
-    return handle(new ImportFileConfiguration(repository, content, path));
-  }
-
-  @Override
-  public Content handle(final ImportFileConfiguration configuration) throws IOException {
-
-    ensurePermitted(configuration.getRepository().getName(), ComposerFormat.NAME, configuration.getAssetName(), emptyMap());
-
-    return doPut(configuration);
-  }
-
-  protected abstract Content doPut(final ImportFileConfiguration configuration) throws IOException;
 
   protected String normalizePath(final String path) {
     String result = path.replaceAll("/+", "/");
@@ -181,10 +148,5 @@ public abstract class ComposerUploadHandlerSupport
   @Override
   public ContentPermissionChecker contentPermissionChecker() {
     return contentPermissionChecker;
-  }
-
-  @Override
-  public boolean supportsExportImport() {
-    return true;
   }
 }
