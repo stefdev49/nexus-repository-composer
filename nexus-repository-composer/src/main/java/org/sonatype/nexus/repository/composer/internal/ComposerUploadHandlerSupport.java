@@ -84,6 +84,22 @@ public abstract class ComposerUploadHandlerSupport
 
   @Override
   public UploadResponse handle(final Repository repository, final ComponentUpload upload) throws IOException {
+    log.info("Handling component upload for repository {}", repository.getName());
+    // log all the fields
+    for (Map.Entry<String, String> entry : upload.getFields().entrySet()) {
+      log.info("ComponentUpload field: {} = {}", entry.getKey(), entry.getValue());
+    }
+    String vendor = upload.getFields().get(GROUP).trim();
+    String name = upload.getFields().get(NAME).trim();
+    String version = upload.getFields().get(VERSION).trim();
+
+    // log all the assets
+    for (AssetUpload asset : upload.getAssetUploads()) {
+      log.info("AssetUpload asset = {}", asset);
+      for (Map.Entry<String, String> entry : asset.getFields().entrySet()) {
+        log.info("AssetUpload field: {} = {}", entry.getKey(), entry.getValue());
+      }
+    }
     String basePath = upload.getFields().get(GROUP).trim();
 
     //Data holders for populating the UploadResponse
@@ -98,12 +114,12 @@ public abstract class ComposerUploadHandlerSupport
       pathToPayload.put(path, asset.getPayload());
     }
 
-    List<Content> responseContents = getResponseContents(repository, pathToPayload);
+    List<Content> responseContents = getResponseContents(vendor, name, version, repository, pathToPayload);
 
     return new UploadResponse(responseContents, new ArrayList<>(pathToPayload.keySet()));
   }
 
-  protected abstract List<Content> getResponseContents(final Repository repository,
+  protected abstract List<Content> getResponseContents(String vendor, String name, String version, final Repository repository,
                                                        final Map<String, PartPayload> pathToPayload)
       throws IOException;
 
@@ -149,7 +165,7 @@ public abstract class ComposerUploadHandlerSupport
       componentFields.add(new UploadFieldDefinition(GROUP, GROUP_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
       componentFields.add(new UploadFieldDefinition(NAME, NAME_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
       componentFields.add(new UploadFieldDefinition(VERSION, VERSION_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
-      definition = getDefinition(ComposerFormat.NAME, true,
+      definition = getDefinition(ComposerFormat.NAME, false,
            componentFields,
           singletonList(new UploadFieldDefinition(FILENAME, false, Type.STRING)),
           new UploadRegexMap("(.*)", FILENAME));
