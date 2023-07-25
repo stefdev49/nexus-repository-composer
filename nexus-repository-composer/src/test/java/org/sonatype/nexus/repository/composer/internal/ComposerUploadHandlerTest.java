@@ -2,9 +2,7 @@ package org.sonatype.nexus.repository.composer.internal;
 
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.sonatype.goodies.testsupport.TestSupport;
-import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.rest.UploadDefinitionExtension;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
@@ -33,9 +31,9 @@ public class ComposerUploadHandlerTest
     private VariableResolverAdapter variableResolverAdapter;
 
 
-    private Set<UploadDefinitionExtension> uploadDefinitionExtensions = new LinkedHashSet<>();
+    private final Set<UploadDefinitionExtension> uploadDefinitionExtensions = new LinkedHashSet<>();
 
-    private ComposerUploadHandler underTest = new ComposerUploadHandler(
+    private final ComposerUploadHandler underTest = new ComposerUploadHandler(
             contentPermissionChecker,
             variableResolverAdapter,
             uploadDefinitionExtensions
