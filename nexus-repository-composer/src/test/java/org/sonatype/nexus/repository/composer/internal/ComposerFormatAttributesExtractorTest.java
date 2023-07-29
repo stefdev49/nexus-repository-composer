@@ -22,6 +22,7 @@ import java.util.Map;
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
+import org.sonatype.nexus.repository.composer.external.ComposerJsonExtractor;
 import org.sonatype.nexus.repository.storage.TempBlob;
 
 import com.fasterxml.jackson.core.type.TypeReference;

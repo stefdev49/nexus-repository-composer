@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.composer.internal;
 
 import org.joda.time.DateTime;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 

@@ -1,4 +1,4 @@
-package org.sonatype.nexus.repository.composer.internal;
+package org.sonatype.nexus.repository.composer.external;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

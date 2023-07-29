@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.composer.internal;
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Request;
