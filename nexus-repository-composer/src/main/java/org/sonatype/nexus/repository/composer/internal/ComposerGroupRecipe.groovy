@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.composer.internal
 
+import org.sonatype.nexus.repository.composer.external.ComposerGroupPackageJsonHandler
+import org.sonatype.nexus.repository.composer.external.ComposerGroupPackagesJsonHandler
+import org.sonatype.nexus.repository.composer.external.ComposerGroupProviderJsonHandler
+
 import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.inject.Named

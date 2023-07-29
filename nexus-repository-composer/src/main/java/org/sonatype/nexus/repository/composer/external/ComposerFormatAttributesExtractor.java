@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.composer.internal;
+package org.sonatype.nexus.repository.composer.external;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -131,7 +131,7 @@ public class ComposerFormatAttributesExtractor
    * is encountered, any string items within the collection are added to a list and stored as a collection of strings.
    */
   @VisibleForTesting
-  void extractStrings(final Map<String, Object> source,
+  public void extractStrings(final Map<String, Object> source,
                       final NestedAttributesMap destination,
                       final Map<String, String> mappings)
   {
@@ -158,7 +158,7 @@ public class ComposerFormatAttributesExtractor
    * Extracts author contact information (except for the role) into a collection of strings.
    */
   @VisibleForTesting
-  void extractAuthors(final Map<String, Object> contents,
+  public void extractAuthors(final Map<String, Object> contents,
                       final NestedAttributesMap formatAttributes)
   {
     Object sourceValue = contents.get(AUTHORS);
@@ -186,7 +186,7 @@ public class ComposerFormatAttributesExtractor
    * string if a string entry with that key is present.
    */
   @VisibleForTesting
-  void extractAuthorPart(final Map<String, Object> author,
+public void extractAuthorPart(final Map<String, Object> author,
                          final List<String> parts,
                          final String key,
                          final String format)
