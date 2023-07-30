@@ -55,8 +55,6 @@ public class OrientComposerHostedRecipe
     extends ComposerRecipeSupport
     implements ComposerHostedRecipe
 {
-  public static final String NAME = "composer-hosted";
-
   @Inject
   Provider<ComposerSecurityFacet> securityFacet;
 

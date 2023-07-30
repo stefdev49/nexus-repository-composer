@@ -10,30 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+package org.sonatype.nexus.repository.composer.internal.ui;
+
+import org.sonatype.nexus.rapture.UiPluginDescriptorSupport;
+
+import javax.annotation.Priority;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
- * Configuration settings in the UI for a Composer group recipe.
+ * Plugin descriptor that registers the plugin-specific UI components (and Javascript) with the repository manager.
  */
-Ext.define('NX.composer.view.repository.recipe.ComposerGroup', {
-  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
-  alias: 'widget.nx-coreui-repository-composer-group',
-  requires: [
-    'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.GroupFacet'
-  ],
-
-  /**
-   * @override
-   */
-  initComponent: function() {
-    var me = this;
-
-    me.items = [
-      {xtype: 'nx-coreui-repository-storage-facet'},
-      {xtype: 'nx-coreui-repository-group-facet', format: 'composer'}
-    ];
-
-    me.callParent();
+@Named
+@Singleton
+@Priority(Integer.MAX_VALUE - 200)
+public class UiPluginDescriptorImpl
+    extends UiPluginDescriptorSupport
+{
+  public UiPluginDescriptorImpl() {
+    super("nexus-repository-composer");
+    setNamespace("NX.composer");
+    setConfigClassName("NX.composer.app.PluginConfig");
   }
-});
+}

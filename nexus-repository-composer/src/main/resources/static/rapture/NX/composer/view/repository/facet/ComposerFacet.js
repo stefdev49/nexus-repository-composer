@@ -15,39 +15,47 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Repository settings form for an apt repository
+ * Configuration specific to composer repositories.
  *
  * @since 3.17
  */
-Ext.define('NX.coreui.view.repository.recipe.ComposerProxy', {
-  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
-  alias: 'widget.nx-coreui-repository-composer-proxy',
+Ext.define('NX.coreui.view.repository.facet.ComposerFacet', {
+  extend: 'Ext.form.FieldContainer',
+  alias: 'widget.nx-composerui-repository-composer-facet',
   requires: [
-    'NX.coreui.view.repository.facet.ComposerFacet',
-    'NX.coreui.view.repository.facet.ProxyFacet',
-    'NX.coreui.view.repository.facet.RoutingRuleFacet',
-    'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.HttpClientFacet',
-    'NX.coreui.view.repository.facet.NegativeCacheFacet',
-    'NX.coreui.view.repository.facet.CleanupPolicyFacet'
+    'NX.I18n'
   ],
-
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [
-      {xtype: 'nx-composerui-repository-composer-facet'},
-      {xtype: 'nx-coreui-repository-proxy-facet'},
-      {xtype: 'nx-coreui-repository-routing-rule-facet'},
-      {xtype: 'nx-coreui-repository-storage-facet'},
-      {xtype: 'nx-coreui-repository-negativecache-facet'},
-      {xtype: 'nx-coreui-repository-cleanup-policy-facet'},
-      {xtype: 'nx-coreui-repository-httpclient-facet'}
+      {
+        xtype: 'fieldset',
+        cls: 'nx-form-section',
+        title: NX.I18n.get('Repository_Facet_ComposerFacet_Title'),
+        items: [
+          {
+            xtype:'textfield',
+            name: 'attributes.composer.distribution',
+            fieldLabel: NX.I18n.get('Repository_Facet_ComposerFacet_Distribution_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_ComposerFacet_Distribution_HelpText'),
+            allowBlank: false
+          },
+          {
+            xtype: 'checkbox',
+            name: 'attributes.composer.flat',
+            fieldLabel: NX.I18n.get('Repository_Facet_ComposerFacet_Flat_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_ComposerFacet_Flat_HelpText'),
+            value: false
+          }
+        ]
+      }
     ];
 
     me.callParent();
   }
+
 });
