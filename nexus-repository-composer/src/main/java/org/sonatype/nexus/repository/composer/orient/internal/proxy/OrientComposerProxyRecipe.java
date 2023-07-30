@@ -29,6 +29,7 @@ import org.sonatype.nexus.repository.composer.orient.internal.OrientComposerFace
 import org.sonatype.nexus.repository.attributes.AttributesFacet;
 import org.sonatype.nexus.repository.cache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.cache.NegativeCacheHandler;
+import org.sonatype.nexus.repository.composer.recipes.ComposerProxyRecipe;
 import org.sonatype.nexus.repository.http.PartialFetchHandler;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.proxy.ProxyHandler;
@@ -55,13 +56,11 @@ import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher;
 
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound;
 
-/**
- * @since 3.17
- */
-@Named(OrientComposerProxyRecipe.NAME)
+@Named(ComposerProxyRecipe.NAME)
 @Singleton
 public class OrientComposerProxyRecipe
     extends ComposerRecipeSupport
+    implements ComposerProxyRecipe
 {
 
   public static final String NAME = "composer-proxy";
@@ -151,6 +150,7 @@ public class OrientComposerProxyRecipe
   public OrientComposerProxyRecipe(@Named(ProxyType.NAME) final Type type, @Named(ComposerFormat.NAME) final Format format)
   {
     super(type, format);
+    log.info("OrientComposerProxyRecipe created");
   }
 
   @Override

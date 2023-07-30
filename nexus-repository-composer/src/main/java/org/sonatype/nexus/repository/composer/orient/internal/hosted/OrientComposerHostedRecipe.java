@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.composer.internal.snapshot.ComposerSnapshot
 import org.sonatype.nexus.repository.composer.orient.ComposerRestoreFacet;
 import org.sonatype.nexus.repository.composer.orient.internal.OrientComposerFacetImpl;
 import org.sonatype.nexus.repository.attributes.AttributesFacet;
+import org.sonatype.nexus.repository.composer.recipes.ComposerHostedRecipe;
 import org.sonatype.nexus.repository.http.PartialFetchHandler;
 import org.sonatype.nexus.repository.search.ElasticSearchFacet;
 import org.sonatype.nexus.repository.security.SecurityHandler;
@@ -48,15 +49,12 @@ import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher;
 
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound;
 
-/**
- * @since 3.17
- */
-@Named(OrientComposerHostedRecipe.NAME)
+@Named(ComposerHostedRecipe.NAME)
 @Singleton
 public class OrientComposerHostedRecipe
     extends ComposerRecipeSupport
+    implements ComposerHostedRecipe
 {
-
   public static final String NAME = "composer-hosted";
 
   @Inject
@@ -130,6 +128,7 @@ public class OrientComposerHostedRecipe
                                @Named(ComposerFormat.NAME) final Format format)
   {
     super(type, format);
+    log.info("Composer hosted recipe initialized");
   }
 
   @Override

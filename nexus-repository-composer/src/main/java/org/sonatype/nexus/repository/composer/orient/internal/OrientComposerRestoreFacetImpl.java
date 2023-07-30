@@ -58,7 +58,7 @@ public class OrientComposerRestoreFacetImpl
       ControlFile controlFile = ComposerPackageParser
           .parsePackageInfo(() -> assetBlob.getBlob().getInputStream())
           .getControlFile();
-      asset = composerFacet.findOrCreateDebAsset(tx, path, new PackageInfo(controlFile));
+      asset = composerFacet.findOrCreateComposerAsset(tx, path, new PackageInfo(controlFile));
     }
     else {
       asset = composerFacet.findOrCreateMetadataAsset(tx, path);

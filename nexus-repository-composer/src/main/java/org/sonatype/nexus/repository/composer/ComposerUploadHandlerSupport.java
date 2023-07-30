@@ -43,6 +43,7 @@ public abstract class ComposerUploadHandlerSupport
     super(uploadDefinitionExtensions);
     this.variableResolverAdapter = variableResolverAdapter;
     this.contentPermissionChecker = contentPermissionChecker;
+    log.info("ComposerUploadHandlerSupport created");
   }
 
   protected void doValidation(final Repository repository, final String assetPath)

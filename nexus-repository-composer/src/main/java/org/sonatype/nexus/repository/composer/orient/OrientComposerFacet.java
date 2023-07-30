@@ -39,7 +39,7 @@ public interface OrientComposerFacet
 
   boolean delete(final String path) throws IOException;
 
-  Asset findOrCreateDebAsset(final StorageTx tx, final String path, final PackageInfo packageInfo);
+  Asset findOrCreateComposerAsset(final StorageTx tx, final String path, final PackageInfo packageInfo);
 
   Asset findOrCreateMetadataAsset(final StorageTx tx, final String path);
 

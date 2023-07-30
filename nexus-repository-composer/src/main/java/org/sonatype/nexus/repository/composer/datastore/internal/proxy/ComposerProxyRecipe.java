@@ -60,6 +60,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound;
 @Singleton
 public class ComposerProxyRecipe
     extends RecipeSupport
+    implements org.sonatype.nexus.repository.composer.recipes.ComposerHostedRecipe
 {
   public static final String NAME = "composer-proxy";
 
@@ -136,6 +137,7 @@ public class ComposerProxyRecipe
   public ComposerProxyRecipe(@Named(ProxyType.NAME) final Type type, @Named(ComposerFormat.NAME) final Format format)
   {
     super(type, format);
+    log.info("proxy/ComposerProxyRecipe initialized");
   }
 
   @Override

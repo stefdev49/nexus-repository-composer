@@ -55,6 +55,7 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound;
 @Singleton
 public class ComposerHostedRecipe
     extends RecipeSupport
+    implements org.sonatype.nexus.repository.composer.recipes.ComposerHostedRecipe
 {
   public static final String NAME = "composer-hosted";
 
@@ -124,6 +125,7 @@ public class ComposerHostedRecipe
       @Named(ComposerFormat.NAME) final Format format)
   {
     super(type, format);
+    log.info("hosted/ComposerHostedRecipe created");
   }
 
   @Override

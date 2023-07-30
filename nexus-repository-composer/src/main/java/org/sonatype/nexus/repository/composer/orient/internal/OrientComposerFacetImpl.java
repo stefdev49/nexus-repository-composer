@@ -138,7 +138,7 @@ public class OrientComposerFacetImpl
     try (final TempBlob tempBlob = storageFacet.createTempBlob(content, ComposerFacetHelper.hashAlgorithms)) {
       StorageTx tx = UnitOfWork.currentTx();
       Asset asset = isDebPackageContentType(path)
-          ? findOrCreateDebAsset(tx, path,
+          ? findOrCreateComposerAsset(tx, path,
           info != null ? info :
               ComposerPackageParser.parsePackageInfo(() -> tempBlob.getBlob().getInputStream()))
           : findOrCreateMetadataAsset(tx, path);
@@ -162,7 +162,7 @@ public class OrientComposerFacetImpl
   }
 
   @Override
-  public Asset findOrCreateDebAsset(final StorageTx tx, final String path, final PackageInfo packageInfo)
+  public Asset findOrCreateComposerAsset(final StorageTx tx, final String path, final PackageInfo packageInfo)
   {
     Bucket bucket = tx.findBucket(getRepository());
     Asset asset = tx.findAssetWithProperty(P_NAME, path, bucket);

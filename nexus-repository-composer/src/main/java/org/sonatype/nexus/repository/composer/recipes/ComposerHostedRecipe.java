@@ -10,26 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.composer.internal;
+package org.sonatype.nexus.repository.composer.recipes;
 
-import org.sonatype.nexus.repository.Format;
-import org.sonatype.nexus.repository.RecipeSupport;
-import org.sonatype.nexus.repository.Type;
-import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.Recipe;
 
-/**
- * Support for Composer recipes
- *
- * @since 3.17
- */
-public abstract class ComposerRecipeSupport
-    extends RecipeSupport
+public interface ComposerHostedRecipe
+    extends Recipe
 {
-  protected ComposerRecipeSupport(
-      final Type type,
-      final Format format)
-  {
-    super(type, format);
-    log.info("ComposerRecipeSupport support created");
-  }
+  String NAME = "composer-hosted";
 }

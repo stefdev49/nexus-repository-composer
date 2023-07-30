@@ -85,6 +85,7 @@ public class ComposerContentFacetImpl
       @Named(ComposerFormat.NAME) final FormatStoreManager formatStoreManager)
   {
     super(formatStoreManager);
+    log.info("ComposerContentFacetImpl initialized");
   }
 
   static class Config
