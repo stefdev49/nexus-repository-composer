@@ -25,6 +25,7 @@ import com.google.common.io.CharStreams;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.sonatype.nexus.repository.composer.external.ComposerJsonExtractor;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

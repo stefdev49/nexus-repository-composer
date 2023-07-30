@@ -10,38 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.composer.internal;
+package org.sonatype.nexus.repository.composer.external;
 
-import org.joda.time.DateTime;
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.Payload;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.List;
+
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.composer.internal.ComposerGroupMergingHandler;
+import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.Payload;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Handler for merging package JSON files together.
+ * Handler for merging packages.json files together.
  */
 @Named
 @Singleton
-public class ComposerGroupPackageJsonHandler
+public class ComposerGroupPackagesJsonHandler
     extends ComposerGroupMergingHandler
 {
   private final ComposerJsonProcessor composerJsonProcessor;
 
   @Inject
-  public ComposerGroupPackageJsonHandler(final ComposerJsonProcessor composerJsonProcessor) {
+  public ComposerGroupPackagesJsonHandler(final ComposerJsonProcessor composerJsonProcessor) {
     this.composerJsonProcessor = checkNotNull(composerJsonProcessor);
   }
 
   @Override
-  protected Content merge(final Repository repository, final List<Payload> payloads) throws IOException {
-    return composerJsonProcessor.mergePackageJson(repository, payloads, DateTime.now());
+  protected Content merge(final Repository repository, final List<Payload> payloads) throws Exception {
+    return composerJsonProcessor.mergePackagesJson(repository, payloads);
   }
 }

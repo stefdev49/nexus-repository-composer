@@ -18,6 +18,8 @@ import org.mockito.Mock;
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.composer.external.ComposerGroupPackagesJsonHandler;
+import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.group.GroupFacet;
 import org.sonatype.nexus.repository.view.*;
 
