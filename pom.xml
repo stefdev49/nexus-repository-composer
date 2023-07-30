@@ -28,7 +28,7 @@
   <modules>
     <module>nexus-repository-composer</module>
     <module>nexus-repository-composer-it</module>
-    <module>nexus-repository-composer-ng</module>
+    <module>nexus-repository-composer-legacy</module>
   </modules>
 
   <scm>
