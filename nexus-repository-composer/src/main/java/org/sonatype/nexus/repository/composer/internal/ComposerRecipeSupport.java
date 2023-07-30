@@ -25,6 +25,14 @@ import org.sonatype.nexus.repository.config.Configuration;
 public abstract class ComposerRecipeSupport
     extends RecipeSupport
 {
+  public static final String VENDOR_TOKEN = "vendor";
+
+  public static final String PROJECT_TOKEN = "project";
+
+  public static final String VERSION_TOKEN = "version";
+
+  public static final String NAME_TOKEN = "name";
+
   protected ComposerRecipeSupport(
       final Type type,
       final Format format)
