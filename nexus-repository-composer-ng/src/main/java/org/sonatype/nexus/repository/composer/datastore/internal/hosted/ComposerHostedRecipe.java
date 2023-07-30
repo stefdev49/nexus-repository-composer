@@ -26,7 +26,6 @@ import org.sonatype.nexus.repository.composer.datastore.ComposerContentFacet;
 import org.sonatype.nexus.repository.composer.datastore.internal.data.ComposerKeyValueFacet;
 import org.sonatype.nexus.repository.composer.datastore.internal.hosted.metadata.ComposerHostedMetadataFacet;
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet;
-import org.sonatype.nexus.repository.composer.internal.gpg.ComposerSigningFacet;
 import org.sonatype.nexus.repository.composer.internal.snapshot.ComposerSnapshotHandler;
 import org.sonatype.nexus.repository.content.browse.BrowseFacet;
 import org.sonatype.nexus.repository.content.search.SearchFacet;
@@ -61,9 +60,6 @@ public class ComposerHostedRecipe
 
   @Inject
   Provider<ComposerSecurityFacet> securityFacet;
-
-  @Inject
-  Provider<ComposerSigningFacet> composerSigningFacet;
 
   @Inject
   Provider<ConfigurableViewFacet> viewFacet;
@@ -134,7 +130,6 @@ public class ComposerHostedRecipe
   public void apply(final Repository repository) throws Exception {
     repository.attach(securityFacet.get());
     repository.attach(configure(viewFacet.get()));
-    repository.attach(composerSigningFacet.get());
     repository.attach(composerContentFacet.get());
     repository.attach(composerHostedFacet.get());
     repository.attach(maintenanceFacet.get());

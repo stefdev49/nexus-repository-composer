@@ -54,7 +54,6 @@ public class ComposerApiRepositoryAdapter
             getHostedStorageAttributes(repository),
             getCleanupPolicyAttributes(repository),
             createComposerHostedRepositoriesAttributes(repository),
-            createComposerSigningRepositoriesAttributes(repository),
             getComponentAttributes(repository));
       case ProxyType.NAME:
         return new ComposerProxyApiRepository(name, url, online,
@@ -73,16 +72,6 @@ public class ComposerApiRepositoryAdapter
   private ComposerHostedRepositoriesAttributes createComposerHostedRepositoriesAttributes(final Repository repository) {
     String distribution = repository.getConfiguration().attributes(ComposerFormat.NAME).get("distribution", String.class);
     return new ComposerHostedRepositoriesAttributes(distribution);
-  }
-
-  private ComposerSigningRepositoriesAttributes createComposerSigningRepositoriesAttributes(final Repository repository) {
-    NestedAttributesMap composerAttributes = repository.getConfiguration().attributes("composerSigning");
-    String keypair = composerAttributes.get("keypair", String.class);
-    String passphrase = composerAttributes.get("passphrase", String.class);
-    if (!Strings2.isBlank(passphrase)) {
-      return new ComposerSigningRepositoriesAttributes(keypair, null);
-    }
-    return null;
   }
 
   private ComposerProxyRepositoriesAttributes createComposerProxyRepositoriesAttributes(final Repository repository) {

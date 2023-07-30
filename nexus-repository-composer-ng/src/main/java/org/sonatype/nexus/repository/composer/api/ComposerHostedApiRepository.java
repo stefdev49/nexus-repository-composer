@@ -25,9 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * REST API model representing an Composer repository.
- * 
- * @since 3.20
+ * REST API model representing a Composer repository.
  */
 @JsonIgnoreProperties(value = {"format", "type", "url"}, allowGetters = true)
 public class ComposerHostedApiRepository
@@ -35,9 +33,6 @@ public class ComposerHostedApiRepository
 {
   @NotNull
   protected final ComposerHostedRepositoriesAttributes composer;
-
-  @NotNull
-  protected final ComposerSigningRepositoriesAttributes composerSigning;
 
   @JsonCreator
   public ComposerHostedApiRepository(
@@ -47,19 +42,14 @@ public class ComposerHostedApiRepository
       @JsonProperty("storage") final HostedStorageAttributes storage,
       @JsonProperty("cleanup") final CleanupPolicyAttributes cleanup,
       @JsonProperty("composer") final ComposerHostedRepositoriesAttributes composer,
-      @JsonProperty("composerSigning") final ComposerSigningRepositoriesAttributes composerSigning,
       @JsonProperty("component") final ComponentAttributes component)
   {
     super(name, ComposerFormat.NAME, url, online, storage, cleanup, component);
     this.composer = composer;
-    this.composerSigning = composerSigning;
   }
 
   public ComposerHostedRepositoriesAttributes getComposer() {
     return composer;
   }
 
-  public ComposerSigningRepositoriesAttributes getComposerSigning() {
-    return composerSigning;
-  }
 }

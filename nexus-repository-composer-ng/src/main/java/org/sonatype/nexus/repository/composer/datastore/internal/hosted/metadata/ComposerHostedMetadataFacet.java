@@ -44,7 +44,6 @@ import org.sonatype.nexus.repository.composer.datastore.internal.hosted.AssetCha
 import org.sonatype.nexus.repository.composer.internal.ComposerMimeTypes;
 import org.sonatype.nexus.repository.composer.internal.debian.ControlFile;
 import org.sonatype.nexus.repository.composer.internal.debian.ControlFile.Paragraph;
-import org.sonatype.nexus.repository.composer.internal.gpg.ComposerSigningFacet;
 import org.sonatype.nexus.repository.composer.internal.hosted.AssetAction;
 import org.sonatype.nexus.repository.composer.internal.hosted.CompressingTempFileStore;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -161,7 +160,6 @@ public class ComposerHostedMetadataFacet
     OffsetDateTime rebuildStart = clock.clusterTime();
 
     ComposerContentFacet composerFacet = content();
-    ComposerSigningFacet signingFacet = signing();
 
     removeMetadataPerArchitecture();
 
@@ -204,14 +202,6 @@ public class ComposerHostedMetadataFacet
     FluentAsset releaseFileAsset = composerFacet.put(
         releaseIndexName(RELEASE),
         new BytesPayload(releaseFile.getBytes(StandardCharsets.UTF_8), ComposerMimeTypes.TEXT)
-    );
-    composerFacet.put(
-        releaseIndexName(INRELEASE),
-        new BytesPayload(signingFacet.signInline(releaseFile), ComposerMimeTypes.TEXT)
-    );
-    composerFacet.put(
-        releaseIndexName(RELEASE_GPG),
-        new BytesPayload(signingFacet.signExternal(releaseFile), ComposerMimeTypes.SIGNATURE)
     );
 
     if (log.isDebugEnabled()) {
@@ -372,10 +362,6 @@ public class ComposerHostedMetadataFacet
 
   private ComposerKeyValueFacet data() {
     return facet(ComposerKeyValueFacet.class);
-  }
-
-  private ComposerSigningFacet signing() {
-    return facet(ComposerSigningFacet.class);
   }
 
   /*

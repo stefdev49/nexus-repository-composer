@@ -40,7 +40,6 @@ import org.sonatype.nexus.repository.composer.internal.ComposerPackageParser;
 import org.sonatype.nexus.repository.composer.internal.debian.ControlFile;
 import org.sonatype.nexus.repository.composer.internal.debian.ControlFile.Paragraph;
 import org.sonatype.nexus.repository.composer.internal.debian.PackageInfo;
-import org.sonatype.nexus.repository.composer.internal.gpg.ComposerSigningFacet;
 import org.sonatype.nexus.repository.composer.internal.hosted.CompressingTempFileStore;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -66,9 +65,7 @@ import static org.apache.http.protocol.HttpDateGenerator.PATTERN_RFC1123;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
-import static org.sonatype.nexus.repository.composer.internal.ReleaseName.INRELEASE;
 import static org.sonatype.nexus.repository.composer.internal.ReleaseName.RELEASE;
-import static org.sonatype.nexus.repository.composer.internal.ReleaseName.RELEASE_GPG;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_BUCKET;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
@@ -102,7 +99,7 @@ public class OrientComposerHostedFacet
           .parsePackageInfo(tempBlob)
           .getControlFile();
       if (control == null) {
-        throw new IllegalOperationException("Invalid Debian package supplied");
+        throw new IllegalOperationException("Invalid Composer package supplied");
       }
       return ingestAsset(control, tempBlob, body.getSize(), body.getContentType());
     }
@@ -148,7 +145,6 @@ public class OrientComposerHostedFacet
   public void rebuildIndexes(final List<AssetChange> changes) throws IOException {
     StorageTx tx = UnitOfWork.currentTx();
     OrientComposerFacet composerFacet = getRepository().facet(OrientComposerFacet.class);
-    ComposerSigningFacet signingFacet = getRepository().facet(ComposerSigningFacet.class);
     Bucket bucket = tx.findBucket(getRepository());
 
     StringBuilder sha256Builder = new StringBuilder();
@@ -180,10 +176,6 @@ public class OrientComposerHostedFacet
     }
 
     composerFacet.put(releaseIndexName(RELEASE), new BytesPayload(releaseFile.getBytes(Charsets.UTF_8), ComposerMimeTypes.TEXT));
-    byte[] inRelease = signingFacet.signInline(releaseFile);
-    composerFacet.put(releaseIndexName(INRELEASE), new BytesPayload(inRelease, ComposerMimeTypes.TEXT));
-    byte[] releaseGpg = signingFacet.signExternal(releaseFile);
-    composerFacet.put(releaseIndexName(RELEASE_GPG), new BytesPayload(releaseGpg, ComposerMimeTypes.SIGNATURE));
   }
 
   private String buildReleaseFile(

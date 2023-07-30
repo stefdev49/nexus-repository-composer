@@ -23,8 +23,6 @@ import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.composer.ComposerFormat;
 import org.sonatype.nexus.repository.composer.internal.ComposerRecipeSupport;
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet;
-import org.sonatype.nexus.repository.composer.internal.gpg.ComposerSigningFacet;
-import org.sonatype.nexus.repository.composer.internal.gpg.ComposerSigningHandler;
 import org.sonatype.nexus.repository.composer.internal.snapshot.ComposerSnapshotHandler;
 import org.sonatype.nexus.repository.composer.orient.ComposerRestoreFacet;
 import org.sonatype.nexus.repository.composer.orient.internal.OrientComposerFacetImpl;
@@ -80,9 +78,6 @@ public class OrientComposerHostedRecipe
   Provider<OrientComposerHostedFacet> composerHostedFacet;
 
   @Inject
-  Provider<ComposerSigningFacet> composerSigningFacet;
-
-  @Inject
   Provider<OrientComposerHostedSnapshotFacet> snapshotFacet;
 
   @Inject
@@ -125,9 +120,6 @@ public class OrientComposerHostedRecipe
   ComposerSnapshotHandler snapshotHandler;
 
   @Inject
-  ComposerSigningHandler signingHandler;
-
-  @Inject
   LastDownloadedHandler lastDownloadedHandler;
 
   @Inject
@@ -148,7 +140,6 @@ public class OrientComposerHostedRecipe
     repository.attach(composerFacet.get());
     repository.attach(composerRestoreFacet.get());
     repository.attach(composerHostedFacet.get());
-    repository.attach(composerSigningFacet.get());
     repository.attach(snapshotFacet.get());
     repository.attach(attributesFacet.get());
     repository.attach(componentMaintenance.get());
@@ -170,7 +161,6 @@ public class OrientComposerHostedRecipe
         .handler(unitOfWorkHandler)
         .handler(lastDownloadedHandler)
         .handler(snapshotHandler)
-        .handler(signingHandler)
         .handler(hostedHandler).create());
 
     builder.defaultHandlers(notFound());
