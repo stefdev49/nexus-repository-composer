@@ -57,7 +57,7 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.composer.internal.ReleaseName.RELEASE;
-import static org.sonatype.nexus.repository.composer.debian.Utils.isDebPackageContentType;
+import static org.sonatype.nexus.repository.composer.external.Utils.isComposerPackageContentType;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
 /**
@@ -100,7 +100,7 @@ public class OrientComposerProxyFacet
 
   @Override
   protected CacheController getCacheController(final Context context) {
-    if (isDebPackageContentType(assetPath(context))) {
+    if (isComposerPackageContentType(assetPath(context))) {
       return cacheControllerHolder.getContentCacheController();
     }
     return cacheControllerHolder.getMetadataCacheController();

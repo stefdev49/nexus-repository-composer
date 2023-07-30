@@ -15,8 +15,6 @@ package org.sonatype.nexus.repository.composer.api;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.composer.ComposerFormat;
 import org.sonatype.nexus.repository.rest.api.SimpleApiRepositoryAdapter;
@@ -53,13 +51,11 @@ public class ComposerApiRepositoryAdapter
             online,
             getHostedStorageAttributes(repository),
             getCleanupPolicyAttributes(repository),
-            createComposerHostedRepositoriesAttributes(repository),
             getComponentAttributes(repository));
       case ProxyType.NAME:
         return new ComposerProxyApiRepository(name, url, online,
             getHostedStorageAttributes(repository),
             getCleanupPolicyAttributes(repository),
-            createComposerProxyRepositoriesAttributes(repository),
             getProxyAttributes(repository),
             getNegativeCacheAttributes(repository),
             getHttpClientAttributes(repository),
@@ -69,15 +65,4 @@ public class ComposerApiRepositoryAdapter
     return null;
   }
 
-  private ComposerHostedRepositoriesAttributes createComposerHostedRepositoriesAttributes(final Repository repository) {
-    String distribution = repository.getConfiguration().attributes(ComposerFormat.NAME).get("distribution", String.class);
-    return new ComposerHostedRepositoriesAttributes(distribution);
-  }
-
-  private ComposerProxyRepositoriesAttributes createComposerProxyRepositoriesAttributes(final Repository repository) {
-    NestedAttributesMap composerAttributes = repository.getConfiguration().attributes(ComposerFormat.NAME);
-    String distribution = composerAttributes.get("distribution", String.class);
-    Boolean flat = composerAttributes.get("flat", Boolean.class);
-    return new ComposerProxyRepositoriesAttributes(distribution, flat);
-  }
 }

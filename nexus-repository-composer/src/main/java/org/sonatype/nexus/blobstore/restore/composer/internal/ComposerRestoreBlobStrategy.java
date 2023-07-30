@@ -30,7 +30,7 @@ import org.sonatype.nexus.common.log.DryRunPrefix;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.composer.ComposerFormat;
 import org.sonatype.nexus.repository.composer.datastore.ComposerContentFacet;
-import org.sonatype.nexus.repository.composer.debian.Utils;
+import org.sonatype.nexus.repository.composer.external.Utils;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.DetachedBlobPayload;
@@ -97,7 +97,7 @@ public class ComposerRestoreBlobStrategy
   @Override
   protected boolean isComponentRequired(final DataStoreRestoreBlobData data) {
     String blobName = data.getBlobName();
-    return Utils.isDebPackageContentType(blobName);
+    return Utils.isComposerPackageContentType(blobName);
   }
 
   @Override

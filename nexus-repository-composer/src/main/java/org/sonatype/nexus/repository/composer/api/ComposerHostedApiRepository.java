@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.composer.api;
 
-import javax.validation.constraints.NotNull;
-
 import org.sonatype.nexus.repository.composer.ComposerFormat;
 import org.sonatype.nexus.repository.rest.api.model.CleanupPolicyAttributes;
 import org.sonatype.nexus.repository.rest.api.model.ComponentAttributes;
@@ -31,9 +29,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComposerHostedApiRepository
     extends SimpleApiHostedRepository
 {
-  @NotNull
-  protected final ComposerHostedRepositoriesAttributes composer;
-
   @JsonCreator
   public ComposerHostedApiRepository(
       @JsonProperty("name") final String name,
@@ -41,15 +36,9 @@ public class ComposerHostedApiRepository
       @JsonProperty("online") final Boolean online,
       @JsonProperty("storage") final HostedStorageAttributes storage,
       @JsonProperty("cleanup") final CleanupPolicyAttributes cleanup,
-      @JsonProperty("composer") final ComposerHostedRepositoriesAttributes composer,
       @JsonProperty("component") final ComponentAttributes component)
   {
     super(name, ComposerFormat.NAME, url, online, storage, cleanup, component);
-    this.composer = composer;
-  }
-
-  public ComposerHostedRepositoriesAttributes getComposer() {
-    return composer;
   }
 
 }

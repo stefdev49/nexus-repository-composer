@@ -27,9 +27,6 @@ public class ComposerHostedRepositoryApiRequestToConfigurationConverter
   @Override
   public Configuration convert(final ComposerHostedRepositoryApiRequest request) {
     Configuration configuration = super.convert(request);
-    configuration.attributes("composer").set("distribution", request.getComposer().getDistribution());
-    configuration.attributes("composerSigning").set("keypair", request.getComposerSigning().getKeypair());
-    configuration.attributes("composerSigning").set("passphrase", request.getComposerSigning().getPassphrase());
     return configuration;
   }
 }

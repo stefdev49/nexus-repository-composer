@@ -119,7 +119,7 @@ public class ComposerHostedHandler
   {
     if (StringUtils.startsWith(path, "dists")
         && StringUtils.endsWithAny(path, INRELEASE, RELEASE, RELEASE_GPG, "/Packages")) {
-      String inReleasePath = "dists/" + contentFacet.getDistribution() + "/" + INRELEASE;
+      String inReleasePath = "dists/" + "dist" + "/" + INRELEASE;
       return !contentFacet.get(inReleasePath).isPresent();
     }
     return false;

@@ -35,10 +35,6 @@ import org.sonatype.nexus.repository.view.payloads.TempBlob;
 public interface ComposerContentFacet
     extends ContentFacet
 {
-  String getDistribution();
-
-  boolean isFlat();
-
   Optional<FluentAsset> getAsset(String path);
 
   Optional<Content> get(String assetPath);

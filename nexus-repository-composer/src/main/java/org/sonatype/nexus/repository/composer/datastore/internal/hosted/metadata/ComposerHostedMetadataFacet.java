@@ -192,7 +192,6 @@ public class ComposerHostedMetadataFacet
       }
 
       releaseFile = buildReleaseFile(
-          composerFacet.getDistribution(),
           store.getFiles().keySet(),
           md5Builder.toString(),
           sha256Builder.toString()
@@ -290,15 +289,14 @@ public class ComposerHostedMetadataFacet
   }
 
   private String buildReleaseFile(
-      final String distribution,
       final Collection<String> architectures,
       final String md5,
       final String sha256)
   {
     String date = DateFormatUtils.format(new Date(), PATTERN_RFC1123, TimeZone.getTimeZone("GMT"));
     Paragraph p = new Paragraph(Arrays.asList(
-        new ControlFile.ControlField("Suite", distribution),
-        new ControlFile.ControlField("Codename", distribution), new ControlFile.ControlField("Components", "main"),
+        new ControlFile.ControlField("Suite", "dist"),
+        new ControlFile.ControlField("Codename", "dists"), new ControlFile.ControlField("Components", "main"),
         new ControlFile.ControlField("Date", date),
         new ControlFile.ControlField("Architectures", String.join(StringUtils.SPACE, architectures)),
         new ControlFile.ControlField("SHA256", sha256), new ControlFile.ControlField("MD5Sum", md5)));
@@ -306,18 +304,15 @@ public class ComposerHostedMetadataFacet
   }
 
   private String mainBinaryPrefix() {
-    String dist = content().getDistribution();
-    return "dists/" + dist + "/main/binary-";
+    return "dists/" + "dist" + "/main/binary-";
   }
 
   private String releaseIndexName(final String name) {
-    String dist = content().getDistribution();
-    return "dists/" + dist + "/" + name;
+    return "dists/" + "dist" + "/" + name;
   }
 
   private String packageIndexName(final String arch, final String ext) {
-    String dist = content().getDistribution();
-    return "dists/" + dist + "/main/binary-" + arch + "/Packages" + ext;
+    return "dists/" + "dist" + "/main/binary-" + arch + "/Packages" + ext;
   }
 
   private String packageRelativeIndexName(final String arch, final String ext) {

@@ -125,11 +125,8 @@ public abstract class OrientComposerSnapshotFacetSupport
     OrientComposerFacet composerFacet = getRepository().facet(OrientComposerFacet.class);
 
     List<SnapshotItem> result = new ArrayList<>();
-    final boolean isFlat = composerFacet.isFlat();
-    final String distribution = composerFacet.getDistribution();
 
-    List<SnapshotItem> releaseIndexItems = fetchSnapshotItems(ComposerFacetHelper.getReleaseIndexSpecifiers(
-        isFlat, distribution));
+    List<SnapshotItem> releaseIndexItems = fetchSnapshotItems(ComposerFacetHelper.getReleaseIndexSpecifiers());
     Map<SnapshotItem.Role, SnapshotItem> itemsByRole = new HashMap<>(
         releaseIndexItems.stream().collect(Collectors.toMap((SnapshotItem item) -> item.specifier.role, item -> item)));
     InputStream releaseStream = null;
@@ -158,17 +155,11 @@ public abstract class OrientComposerSnapshotFacetSupport
     }
 
     result.addAll(releaseIndexItems);
-
-    if (isFlat) {
-      result.addAll(fetchSnapshotItems(ComposerFacetHelper.getReleasePackageIndexes(isFlat, distribution, null, null)));
-    }
-    else {
-      List<String> archs = selector.getArchitectures(release);
-      List<String> comps = selector.getComponents(release);
-      for (String arch : archs) {
-        for (String comp : comps) {
-          result.addAll(fetchSnapshotItems(ComposerFacetHelper.getReleasePackageIndexes(isFlat, distribution, comp, arch)));
-        }
+    List<String> archs = selector.getArchitectures(release);
+    List<String> comps = selector.getComponents(release);
+    for (String arch : archs) {
+      for (String comp : comps) {
+        result.addAll(fetchSnapshotItems(ComposerFacetHelper.getReleasePackageIndexes(comp, arch)));
       }
     }
 

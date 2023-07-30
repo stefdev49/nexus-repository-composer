@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.composer.debian;
+package org.sonatype.nexus.repository.composer.external;
 
 /**
  * @since 3.17
@@ -20,7 +20,7 @@ public class Utils
   private Utils(){
   }
 
-  public static boolean isDebPackageContentType(final String path) {
-    return path.endsWith(".deb") || path.endsWith(".udeb");
+  public static boolean isComposerPackageContentType(final String path) {
+    return path.endsWith(".zip");
   }
 }

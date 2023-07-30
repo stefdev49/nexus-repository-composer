@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.repository.composer.rest;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.sonatype.nexus.repository.composer.api.ComposerHostedRepositoriesAttributes;
 import org.sonatype.nexus.repository.composer.ComposerFormat;
 import org.sonatype.nexus.repository.rest.api.model.ComponentAttributes;
 import org.sonatype.nexus.repository.rest.api.model.HostedRepositoryApiRequest;
@@ -33,34 +29,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComposerHostedRepositoryApiRequest
     extends HostedRepositoryApiRequest
 {
-  @NotNull
-  @Valid
-  protected final ComposerHostedRepositoriesAttributes composer;
-
-  @NotNull
-  @Valid
-  protected final ComposerSigningRepositoriesAttributes composerSigning;
-
   @JsonCreator
   public ComposerHostedRepositoryApiRequest(
       @JsonProperty("name") final String name,
       @JsonProperty("online") final Boolean online,
       @JsonProperty("storage") final HostedStorageAttributes storage,
       @JsonProperty("cleanup") final CleanupPolicyAttributes cleanup,
-      @JsonProperty("composer") final ComposerHostedRepositoriesAttributes composer,
-      @JsonProperty("composerSigning") final ComposerSigningRepositoriesAttributes composerSigning,
       @JsonProperty("component") final ComponentAttributes componentAttributes)
   {
     super(name, ComposerFormat.NAME, online, storage, cleanup, componentAttributes);
-    this.composer = composer;
-    this.composerSigning = composerSigning;
-  }
-
-  public ComposerHostedRepositoriesAttributes getComposer() {
-    return composer;
-  }
-
-  public ComposerSigningRepositoriesAttributes getComposerSigning() {
-    return composerSigning;
   }
 }

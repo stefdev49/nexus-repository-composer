@@ -23,7 +23,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.composer.internal.ComposerPackageParser;
 import org.sonatype.nexus.repository.composer.internal.debian.ControlFile;
 import org.sonatype.nexus.repository.composer.internal.debian.PackageInfo;
-import org.sonatype.nexus.repository.composer.debian.Utils;
+import org.sonatype.nexus.repository.composer.external.Utils;
 import org.sonatype.nexus.repository.composer.orient.OrientComposerFacet;
 import org.sonatype.nexus.repository.composer.orient.ComposerRestoreFacet;
 import org.sonatype.nexus.repository.storage.Asset;
@@ -35,7 +35,7 @@ import org.sonatype.nexus.repository.transaction.TransactionalTouchBlob;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
-import static org.sonatype.nexus.repository.composer.debian.Utils.isDebPackageContentType;
+import static org.sonatype.nexus.repository.composer.external.Utils.isComposerPackageContentType;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_GROUP;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
@@ -54,7 +54,7 @@ public class OrientComposerRestoreFacetImpl
     StorageTx tx = UnitOfWork.currentTx();
     Asset asset;
     OrientComposerFacet composerFacet = facet(OrientComposerFacet.class);
-    if (isDebPackageContentType(path)) {
+    if (isComposerPackageContentType(path)) {
       ControlFile controlFile = ComposerPackageParser
           .parsePackageInfo(() -> assetBlob.getBlob().getInputStream())
           .getControlFile();
@@ -90,6 +90,6 @@ public class OrientComposerRestoreFacetImpl
 
   @Override
   public boolean componentRequired(final String name) {
-   return Utils.isDebPackageContentType(name);
+   return Utils.isComposerPackageContentType(name);
   }
 }

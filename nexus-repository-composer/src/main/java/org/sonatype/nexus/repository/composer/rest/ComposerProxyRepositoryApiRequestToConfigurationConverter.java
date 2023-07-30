@@ -34,8 +34,6 @@ public class ComposerProxyRepositoryApiRequestToConfigurationConverter
   @Override
   public Configuration convert(final ComposerProxyRepositoryApiRequest request) {
     Configuration configuration = super.convert(request);
-    configuration.attributes("composer").set("distribution", request.getComposer().getDistribution());
-    configuration.attributes("composer").set("flat", request.getComposer().getFlat());
     return configuration;
   }
 }

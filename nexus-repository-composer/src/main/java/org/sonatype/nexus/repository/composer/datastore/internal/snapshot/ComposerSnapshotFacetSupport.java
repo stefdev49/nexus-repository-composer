@@ -96,8 +96,7 @@ public abstract class ComposerSnapshotFacetSupport
   protected Iterable<SnapshotItem> collectSnapshotItems(final SnapshotComponentSelector selector) throws IOException {
     ComposerContentFacet composerFacet = getRepository().facet(ComposerContentFacet.class);
 
-    List<SnapshotItem> releaseIndexItems =
-        fetchSnapshotItems(ComposerFacetHelper.getReleaseIndexSpecifiers(composerFacet.isFlat(), composerFacet.getDistribution()));
+    List<SnapshotItem> releaseIndexItems = fetchSnapshotItems(ComposerFacetHelper.getReleaseIndexSpecifiers());
     Map<SnapshotItem.Role, SnapshotItem> itemsByRole = new EnumMap<>(
         releaseIndexItems.stream().collect(Collectors.toMap((SnapshotItem item) -> item.specifier.role, item -> item)));
     InputStream releaseStream = null;
@@ -128,18 +127,11 @@ public abstract class ComposerSnapshotFacetSupport
     }
 
     List<SnapshotItem> result = new ArrayList<>(releaseIndexItems);
-    if (composerFacet.isFlat()) {
-      result.addAll(fetchSnapshotItems(
-          ComposerFacetHelper.getReleasePackageIndexes(composerFacet.isFlat(), composerFacet.getDistribution(), null, null)));
-    }
-    else {
       List<String> archs = selector.getArchitectures(release);
       List<String> comps = selector.getComponents(release);
       for (String arch : archs) {
         for (String comp : comps) {
-          result.addAll(fetchSnapshotItems(
-              ComposerFacetHelper.getReleasePackageIndexes(composerFacet.isFlat(), composerFacet.getDistribution(), comp, arch)));
-        }
+          result.addAll(fetchSnapshotItems(ComposerFacetHelper.getReleasePackageIndexes(comp, arch)));
       }
     }
 

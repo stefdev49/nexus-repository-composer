@@ -37,10 +37,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComposerProxyRepositoryApiRequest
     extends ProxyRepositoryApiRequest
 {
-  @NotNull
-  @Valid
-  protected final ComposerProxyRepositoriesAttributes composer;
-
   @SuppressWarnings("squid:S00107") // suppress constructor parameter count
   @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
   public ComposerProxyRepositoryApiRequest(
@@ -48,7 +44,6 @@ public class ComposerProxyRepositoryApiRequest
       @JsonProperty("online") final Boolean online,
       @JsonProperty("storage") final StorageAttributes storage,
       @JsonProperty("cleanup") final CleanupPolicyAttributes cleanup,
-      @JsonProperty("composer") final ComposerProxyRepositoriesAttributes composer,
       @JsonProperty("proxy") final ProxyAttributes proxy,
       @JsonProperty("negativeCache") final NegativeCacheAttributes negativeCache,
       @JsonProperty("httpClient") final HttpClientAttributes httpClient,
@@ -57,10 +52,5 @@ public class ComposerProxyRepositoryApiRequest
       final ReplicationAttributes replication)
   {
     super(name, ComposerFormat.NAME, online, storage, cleanup, proxy, negativeCache, httpClient, routingRule, replication);
-    this.composer = composer;
-  }
-
-  public ComposerProxyRepositoriesAttributes getComposer() {
-    return composer;
   }
 }

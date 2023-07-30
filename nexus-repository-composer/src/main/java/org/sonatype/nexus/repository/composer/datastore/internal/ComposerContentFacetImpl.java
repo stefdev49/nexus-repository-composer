@@ -58,7 +58,7 @@ import static org.sonatype.nexus.common.entity.Continuations.iterableOf;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
-import static org.sonatype.nexus.repository.composer.debian.Utils.isDebPackageContentType;
+import static org.sonatype.nexus.repository.composer.external.Utils.isComposerPackageContentType;
 import static org.sonatype.nexus.repository.composer.internal.ComposerFacetHelper.normalizeAssetPath;
 import static org.sonatype.nexus.repository.composer.internal.ComposerProperties.DEB;
 import static org.sonatype.nexus.repository.composer.internal.ComposerProperties.P_ARCHITECTURE;
@@ -88,17 +88,6 @@ public class ComposerContentFacetImpl
     log.info("ComposerContentFacetImpl initialized");
   }
 
-  static class Config
-  {
-    @NotNull(groups = {HostedType.ValidationGroup.class, ProxyType.ValidationGroup.class})
-    public String distribution;
-
-    @NotNull(groups = {ProxyType.ValidationGroup.class})
-    public boolean flat;
-  }
-
-  private Config config;
-
   @Override
   protected WritePolicy writePolicy(final Asset asset) {
     WritePolicy writePolicy = super.writePolicy(asset);
@@ -112,24 +101,6 @@ public class ComposerContentFacetImpl
       }
     }
     return writePolicy;
-  }
-
-  @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    super.doConfigure(configuration);
-    config = facet(ConfigurationFacet.class)
-        .readSection(configuration, CONFIG_KEY, Config.class);
-    log.debug("Composer config: {}", config);
-  }
-
-  @Override
-  public String getDistribution() {
-    return config.distribution;
-  }
-
-  @Override
-  public boolean isFlat() {
-    return config.flat;
   }
 
   @Override
@@ -155,7 +126,7 @@ public class ComposerContentFacetImpl
     String normalizedPath = normalizeAssetPath(path);
 
     try (TempBlob tempBlob = blobs().ingest(payload, ComposerFacetHelper.hashAlgorithms)) {
-      return isDebPackageContentType(normalizedPath)
+      return isComposerPackageContentType(normalizedPath)
           ? findOrCreateDebAsset(normalizedPath, tempBlob, packageInfo)
           : findOrCreateMetadataAsset(tempBlob, normalizedPath);
     }

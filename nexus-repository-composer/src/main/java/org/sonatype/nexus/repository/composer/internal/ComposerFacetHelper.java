@@ -60,56 +60,34 @@ public class ComposerFacetHelper
   /**
    * Returns list of the release indexes specifiers
    *
-   * @param isFlat - Type of the repository. Flat repository doesn't have distribution
-   * @param dist   - Composer package distribution
    * @return - list of the release indexes specifiers
    */
-  public static List<ContentSpecifier> getReleaseIndexSpecifiers(boolean isFlat, final String dist) {
-    if (isFlat) {
+  public static List<ContentSpecifier> getReleaseIndexSpecifiers() {
       return ImmutableList.of(
-          new ContentSpecifier(RELEASE, SnapshotItem.Role.RELEASE_INDEX),
-          new ContentSpecifier(RELEASE_GPG, SnapshotItem.Role.RELEASE_SIG),
-          new ContentSpecifier(INRELEASE, SnapshotItem.Role.RELEASE_INLINE_INDEX));
-    }
-    else {
-      return ImmutableList.of(
-          new ContentSpecifier(String.format(RELEASE_PATH, dist, RELEASE), SnapshotItem.Role.RELEASE_INDEX),
-          new ContentSpecifier(String.format(RELEASE_PATH, dist, RELEASE_GPG), SnapshotItem.Role.RELEASE_SIG),
-          new ContentSpecifier(String.format(RELEASE_PATH, dist, INRELEASE), SnapshotItem.Role.RELEASE_INLINE_INDEX));
-    }
+          new ContentSpecifier(String.format(RELEASE_PATH, "dist", RELEASE), SnapshotItem.Role.RELEASE_INDEX),
+          new ContentSpecifier(String.format(RELEASE_PATH, "dist", RELEASE_GPG), SnapshotItem.Role.RELEASE_SIG),
+          new ContentSpecifier(String.format(RELEASE_PATH, "dist", INRELEASE), SnapshotItem.Role.RELEASE_INLINE_INDEX));
   }
 
   /**
    * Returns list of the release package indexes
    *
-   * @param isFlat    - Type of the repository. Flat repository doesn't have distribution
-   * @param dist      - Composer package distribution
    * @param component - Composer Component
    * @param arch      - Package type of architecture. e.g. amd64
    * @return - list of the release package indexes
    */
-  public static List<ContentSpecifier> getReleasePackageIndexes(boolean isFlat, final String dist,
-                                                                final String component,
+  public static List<ContentSpecifier> getReleasePackageIndexes(final String component,
                                                                 final String arch)
   {
-    if (isFlat) {
       return ImmutableList.of(
-          new ContentSpecifier(PACKAGES, SnapshotItem.Role.PACKAGE_INDEX_RAW),
-          new ContentSpecifier(PACKAGES_GZ, SnapshotItem.Role.PACKAGE_INDEX_GZ),
-          new ContentSpecifier(PACKAGES_BZ2, SnapshotItem.Role.PACKAGE_INDEX_BZ2),
-          new ContentSpecifier(PACKAGES_XZ, SnapshotItem.Role.PACKAGE_INDEX_XZ));
-    }
-    else {
-      return ImmutableList.of(
-          new ContentSpecifier(String.format(PACKAGE_PATH, dist, component, arch, PACKAGES),
+          new ContentSpecifier(String.format(PACKAGE_PATH, "dist", component, arch, PACKAGES),
               SnapshotItem.Role.PACKAGE_INDEX_RAW),
-          new ContentSpecifier(String.format(PACKAGE_PATH, dist, component, arch, PACKAGES_GZ),
+          new ContentSpecifier(String.format(PACKAGE_PATH, "dist", component, arch, PACKAGES_GZ),
               SnapshotItem.Role.PACKAGE_INDEX_GZ),
-          new ContentSpecifier(String.format(PACKAGE_PATH, dist, component, arch, PACKAGES_BZ2),
+          new ContentSpecifier(String.format(PACKAGE_PATH, "dist", component, arch, PACKAGES_BZ2),
               SnapshotItem.Role.PACKAGE_INDEX_BZ2),
-          new ContentSpecifier(String.format(PACKAGE_PATH, dist, component, arch, PACKAGES_XZ),
+          new ContentSpecifier(String.format(PACKAGE_PATH, "dist", component, arch, PACKAGES_XZ),
               SnapshotItem.Role.PACKAGE_INDEX_XZ));
-    }
   }
 
   /**

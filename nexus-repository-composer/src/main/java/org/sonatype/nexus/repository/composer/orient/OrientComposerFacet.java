@@ -42,8 +42,4 @@ public interface OrientComposerFacet
   Asset findOrCreateComposerAsset(final StorageTx tx, final String path, final PackageInfo packageInfo);
 
   Asset findOrCreateMetadataAsset(final StorageTx tx, final String path);
-
-  boolean isFlat();
-
-  String getDistribution();
 }

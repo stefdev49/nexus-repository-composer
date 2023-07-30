@@ -48,7 +48,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 
 import static java.util.Collections.singletonList;
-import static org.sonatype.nexus.repository.composer.debian.Utils.isDebPackageContentType;
+import static org.sonatype.nexus.repository.composer.external.Utils.isComposerPackageContentType;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_GROUP;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
@@ -65,24 +65,11 @@ public class OrientComposerFacetImpl
   @VisibleForTesting
   static final String CONFIG_KEY = "composer";
 
-  @VisibleForTesting
-  static class Config
-  {
-    @NotNull(groups = {HostedType.ValidationGroup.class, ProxyType.ValidationGroup.class})
-    public String distribution;
-
-    @NotNull(groups = {ProxyType.ValidationGroup.class})
-    public boolean flat;
-  }
-
-  private Config config;
-
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
     facet(ConfigurationFacet.class).validateSection(
         configuration,
         CONFIG_KEY,
-        Config.class,
         Default.class,
         getRepository().getType().getValidationGroup());
   }
@@ -91,26 +78,6 @@ public class OrientComposerFacetImpl
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
     getRepository().facet(StorageFacet.class).registerWritePolicySelector(new OrientComposerWritePolicySelector());
-  }
-
-  @Override
-  protected void doConfigure(final Configuration configuration) throws Exception {
-    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
-  }
-
-  @Override
-  protected void doDestroy() throws Exception {
-    config = null;
-  }
-
-  @Override
-  public String getDistribution() {
-    return config.distribution;
-  }
-
-  @Override
-  public boolean isFlat() {
-    return config.flat;
   }
 
   @Override
@@ -137,7 +104,7 @@ public class OrientComposerFacetImpl
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (final TempBlob tempBlob = storageFacet.createTempBlob(content, ComposerFacetHelper.hashAlgorithms)) {
       StorageTx tx = UnitOfWork.currentTx();
-      Asset asset = isDebPackageContentType(path)
+      Asset asset = isComposerPackageContentType(path)
           ? findOrCreateComposerAsset(tx, path,
           info != null ? info :
               ComposerPackageParser.parsePackageInfo(() -> tempBlob.getBlob().getInputStream()))
