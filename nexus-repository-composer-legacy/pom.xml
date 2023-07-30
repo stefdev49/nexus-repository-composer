@@ -8,56 +8,27 @@
     <version>0.0.30-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-repository-composer</artifactId>
+  <artifactId>nexus-repository-composer-legacy</artifactId>
   <packaging>bundle</packaging>
 
-  <!-- core dependencies -->
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository-content</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-blobstore-tasks</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-cleanup</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rapture</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- external dependencies -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
@@ -67,7 +38,16 @@
       <artifactId>nexus-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-cleanup</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rapture</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-core</artifactId>
@@ -112,6 +92,27 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.20</version>
+        <configuration>
+          <useSystemClassLoader>false</useSystemClassLoader>
+        </configuration>
+      </plugin>
+      <!--
+      during 'verify' phase, ensure the new repository format plugin is installed locally, for use by ITs.
+      -->
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

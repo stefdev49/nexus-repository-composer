@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-present Sonatype, Inc.
+ * Copyright (c) 2018-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,24 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.composer.rest;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.ws.rs.Path;
-
-import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceV1;
-
-import static org.sonatype.nexus.repository.composer.rest.ComposerProxyRepositoriesApiResourceV1.RESOURCE_URI;
+/*global Ext, NX*/
 
 /**
- * @since 3.26
+ * Composer plugin strings.
  */
-@Named
-@Singleton
-@Path(RESOURCE_URI)
-public class ComposerProxyRepositoriesApiResourceV1
-    extends ComposerProxyRepositoriesApiResource
-{
-  static final String RESOURCE_URI = RepositoriesApiResourceV1.RESOURCE_URI + "/composer/proxy";
-}
+Ext.define('NX.composer.app.PluginStrings', {
+  '@aggregate_priority': 90,
+
+  singleton: true,
+  requires: [
+    'NX.I18n'
+  ],
+
+  keys: {
+    SearchComposer_Group: 'Composer Repositories',
+    SearchComposer_Text: 'Composer',
+    SearchComposer_Description: 'Search for components in Composer repositories'
+  }
+}, function(self) {
+  NX.I18n.register(self);
+});

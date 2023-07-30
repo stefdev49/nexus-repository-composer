@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-present Sonatype, Inc.
+ * Copyright (c) 2018-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,17 +20,17 @@ import org.sonatype.nexus.repository.security.SecurityFacetSupport;
 import org.sonatype.nexus.repository.security.VariableResolverAdapter;
 
 /**
- * @since 3.17
+ * Composer format security facet.
  */
 @Named
 public class ComposerSecurityFacet
     extends SecurityFacetSupport
 {
   @Inject
-  public ComposerSecurityFacet(
-                          final ComposerFormatSecurityContributor securityResource,
-                          @Named("simple") final VariableResolverAdapter variableResolverAdapter,
-                          final ContentPermissionChecker contentPermissionChecker) {
-    super(securityResource, variableResolverAdapter, contentPermissionChecker);
+  public ComposerSecurityFacet(final ComposerFormatSecurityContributor securityContributor,
+                            @Named("simple") final VariableResolverAdapter variableResolverAdapter,
+                            final ContentPermissionChecker contentPermissionChecker)
+  {
+    super(securityContributor, variableResolverAdapter, contentPermissionChecker);
   }
 }

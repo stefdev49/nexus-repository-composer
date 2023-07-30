@@ -14,12 +14,8 @@
 -->
 # Nexus Repository Composer Format
 
-This repository is a fork of the [Sonatype Nexus Repository Composer Format](https://github.com/sonatype-nexus-community/nexus-repository-composer) plugin.
-It is ahead of the original repository in terms of following features:
-- rest api to configure composer repositories
-- support for upload package GUI
-
-PR for these features have been opend to the original repository but not merged yet.
+This repository was initally a fork of the [Sonatype Nexus Repository Composer Format](https://github.com/sonatype-nexus-community/nexus-repository-composer) plugin.
+It is now a rewite of the original plugin with code based on the apt repository plugin to build a full fledged repository plugin for composer..
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-composer.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-composer%22) 
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-composer.svg?style=shield)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-composer)

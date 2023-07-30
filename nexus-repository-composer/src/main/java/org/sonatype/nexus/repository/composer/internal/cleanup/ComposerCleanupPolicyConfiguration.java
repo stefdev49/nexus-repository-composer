@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2017-present Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.cleanup.config.CleanupPolicyConfiguration;
-import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
+import org.sonatype.nexus.repository.composer.ComposerFormat;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -28,7 +28,7 @@ import static org.sonatype.nexus.repository.search.DefaultComponentMetadataProdu
 import static org.sonatype.nexus.repository.search.DefaultComponentMetadataProducer.REGEX_KEY;
 
 /**
- * @since 3.next
+ * @since 3.19
  */
 @Named(ComposerFormat.NAME)
 @Singleton
