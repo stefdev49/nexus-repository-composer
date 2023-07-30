@@ -26,7 +26,7 @@
   <inceptionYear>2018</inceptionYear>
 
   <modules>
-    <module>nexus-repository-composer</module>
+    <module>nexus-repository-composer-legacy</module>
     <module>nexus-repository-composer-it</module>
   </modules>
 
