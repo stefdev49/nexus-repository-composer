@@ -17,13 +17,13 @@
 /*global Ext, NX*/
 
 /**
- * Configuration specific to raw repos to set content-disposition
+ * Configuration specific to composer repos to set content-disposition
  *
  * @since 3.25
  */
 Ext.define('NX.composer.view.repository.facet.ComposerFacet', {
   extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-composer-repository-composer-facet',
+  alias: 'widget.nx-coreui-repository-composer-facet',
   requires: [
     'NX.I18n'
   ],
@@ -42,7 +42,7 @@ Ext.define('NX.composer.view.repository.facet.ComposerFacet', {
     var me = this;
 
     // Newly added repos should default to being Attachment
-    if (me.up("nx-composer-repository-add") != null) {
+    if (me.up("nx-coreui-repository-add") != null) {
       me.contentDisposition = 'ATTACHMENT';
     }
 
