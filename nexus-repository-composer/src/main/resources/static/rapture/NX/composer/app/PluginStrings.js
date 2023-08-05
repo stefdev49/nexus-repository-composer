@@ -13,31 +13,21 @@
 /*global Ext, NX*/
 
 /**
- * Configuration settings in the UI for a Composer group recipe.
+ * Composer plugin strings.
  */
-Ext.define('NX.composer.view.repository.recipe.ComposerGroup', {
-  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
-  alias: 'widget.nx-coreui-repository-composer-group',
+Ext.define('NX.composer.app.PluginStrings', {
+  '@aggregate_priority': 90,
+
+  singleton: true,
   requires: [
-    'NX.coreui.view.repository.facet.ReplicationFacet',
-    'NX.coreui.view.repository.facet.ComposerFacet',
-    'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.GroupFacet'
+    'NX.I18n'
   ],
 
-  /**
-   * @override
-   */
-  initComponent: function() {
-    var me = this;
-
-    me.items = [
-      {xtype: 'nx-coreui-repository-replication-facet'},
-      {xtype: 'nx-coreui-repository-composer-facet'},
-      {xtype: 'nx-coreui-repository-storage-facet'},
-      {xtype: 'nx-coreui-repository-group-facet', format: 'composer' }
-    ];
-
-    me.callParent();
+  keys: {
+    SearchComposer_Group: 'Composer Repositories',
+    SearchComposer_Text: 'Composer',
+    SearchComposer_Description: 'Search for components in Composer repositories'
   }
+}, function(self) {
+  NX.I18n.register(self);
 });
