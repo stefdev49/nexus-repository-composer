@@ -40,8 +40,6 @@ public abstract class ComposerUploadHandlerSupport
 {
   protected static final String FILENAME = "filename";
 
-  protected static final String FILENAME_HELP_TEXT = "Filename of the uploaded zip file";
-
   protected static final String VENDOR = "vendor";
 
   protected static final String VENDOR_HELP_TEXT = "Component Vendor";
@@ -146,10 +144,9 @@ public abstract class ComposerUploadHandlerSupport
       componentFields.add(new UploadFieldDefinition(VENDOR, VENDOR_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
       componentFields.add(new UploadFieldDefinition(PROJECT, NAME_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
       componentFields.add(new UploadFieldDefinition(VERSION, VERSION_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
-      definition = getDefinition(ComposerFormat.NAME, false,
-           componentFields,
-          singletonList(new UploadFieldDefinition(FILENAME, FILENAME_HELP_TEXT, false, Type.STRING)),
-          new UploadRegexMap("(.*).[zZ][iI][pP]", FILENAME));
+          definition = getDefinition(ComposerFormat.NAME, false, componentFields,
+          singletonList(new UploadFieldDefinition(FILENAME,false, Type.STRING)),
+          new UploadRegexMap("(.*)", FILENAME));
     }
     return definition;
   }
