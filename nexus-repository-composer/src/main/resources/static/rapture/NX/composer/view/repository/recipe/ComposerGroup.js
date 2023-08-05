@@ -17,39 +17,31 @@
 /*global Ext, NX*/
 
 /**
- * Repository "Settings" form for a Maven Proxy repository
+ * Repository "Settings" form for a Composer Group repository.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.recipe.ComposerProxy', {
+Ext.define('NX.coreui.view.repository.recipe.ComposerGroup', {
   extend: 'NX.coreui.view.repository.RepositorySettingsForm',
-  alias: 'widget.nx-coreui-repository-composer-proxy',
+  alias: 'widget.nx-coreui-repository-composer-group',
   requires: [
     'NX.coreui.view.repository.facet.ReplicationFacet',
     'NX.coreui.view.repository.facet.ComposerFacet',
-    'NX.coreui.view.repository.facet.ProxyFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.RoutingRuleFacet',
-    'NX.coreui.view.repository.facet.HttpClientFacet',
-    'NX.coreui.view.repository.facet.NegativeCacheFacet',
-    'NX.coreui.view.repository.facet.CleanupPolicyFacet'
+    'NX.coreui.view.repository.facet.GroupFacet'
   ],
 
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [
       {xtype: 'nx-coreui-repository-replication-facet'},
       {xtype: 'nx-coreui-repository-composer-facet'},
-      {xtype: 'nx-coreui-repository-proxy-facet'},
       {xtype: 'nx-coreui-repository-storage-facet'},
-      {xtype: 'nx-coreui-repository-routing-rule-facet'},
-      {xtype: 'nx-coreui-repository-negativecache-facet'},
-      {xtype: 'nx-coreui-repository-cleanup-policy-facet'},
-      {xtype: 'nx-coreui-repository-httpclient-facet'}
+      {xtype: 'nx-coreui-repository-group-facet', format: 'composer' }
     ];
 
     me.callParent();

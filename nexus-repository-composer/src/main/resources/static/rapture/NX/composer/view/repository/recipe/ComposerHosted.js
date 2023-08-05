@@ -14,16 +14,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
- * Repository settings form for a composer repository
+ * Repository "Settings" form for a Maven Hosted repository.
  *
- * @since 3.17
+ * @since 3.0
  */
 Ext.define('NX.coreui.view.repository.recipe.ComposerHosted', {
   extend: 'NX.coreui.view.repository.RepositorySettingsForm',
   alias: 'widget.nx-coreui-repository-composer-hosted',
   requires: [
-    'NX.coreui.view.repository.facet.ComposerHostedFacet',
+    'NX.coreui.view.repository.facet.ReplicationFacet',
+    'NX.coreui.view.repository.facet.ComposerFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
     'NX.coreui.view.repository.facet.StorageFacetHosted',
     'NX.coreui.view.repository.facet.CleanupPolicyFacet'
@@ -36,9 +39,10 @@ Ext.define('NX.coreui.view.repository.recipe.ComposerHosted', {
     var me = this;
 
     me.items = [
-      {xtype: 'nx-composerui-repository-composerhosted-facet'},
-      {xtype: 'nx-coreui-repository-storage-facet'},
-      {xtype: 'nx-coreui-repository-storage-hosted-facet'},
+      {xtype: 'nx-coreui-repository-replication-facet'},
+      {xtype: 'nx-coreui-repository-composer-facet'},
+      {xtype: 'nx-coreui-repository-storage-facet', strictContentTypeValidation: false},
+      {xtype: 'nx-coreui-repository-storage-hosted-facet', writePolicy: 'ALLOW'},
       {xtype: 'nx-coreui-repository-cleanup-policy-facet'}
     ];
 

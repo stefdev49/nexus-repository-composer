@@ -14,42 +14,59 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
- * Configuration specific to composer repositories.
+ * Configuration specific to raw repos to set content-disposition
  *
- * @since 3.17
+ * @since 3.25
  */
 Ext.define('NX.coreui.view.repository.facet.ComposerFacet', {
   extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-composerui-repository-composer-facet',
+  alias: 'widget.nx-coreui-repository-composer-facet',
   requires: [
     'NX.I18n'
   ],
+
+  defaults: {
+    itemCls: 'required-field'
+  },
+
+  // Default to inline for existing raw repos
+  contentDisposition: 'INLINE',
+
   /**
    * @override
    */
   initComponent: function() {
     var me = this;
 
+    // Newly added repos should default to being Attachment
+    if (me.up("nx-coreui-repository-add") != null) {
+      me.contentDisposition = 'ATTACHMENT';
+    }
+
     me.items = [
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: NX.I18n.get('Repository_Facet_ComposerFacet_Title'),
+        title: NX.I18n.get('Repository_Facet_Composer_Title'),
+
         items: [
           {
-            xtype:'textfield',
-            name: 'attributes.composer.distribution',
-            fieldLabel: NX.I18n.get('Repository_Facet_ComposerFacet_Distribution_FieldLabel'),
-            helpText: NX.I18n.get('Repository_Facet_ComposerFacet_Distribution_HelpText'),
-            allowBlank: false
-          },
-          {
-            xtype: 'checkbox',
-            name: 'attributes.composer.flat',
-            fieldLabel: NX.I18n.get('Repository_Facet_ComposerFacet_Flat_FieldLabel'),
-            helpText: NX.I18n.get('Repository_Facet_ComposerFacet_Flat_HelpText'),
-            value: false
+            xtype: 'combo',
+            name: 'attributes.raw.contentDisposition',
+            itemId: 'contentDisposition',
+            allowBlank: false,
+            fieldLabel: NX.I18n.get('Repository_Facet_Composer_ContentDisposition_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_Composer_ContentDisposition_HelpText'),
+            editable: false,
+            store: [
+              ['INLINE', NX.I18n.get('Repository_Facet_Composer_ContentDisposition_Inline')],
+              ['ATTACHMENT', NX.I18n.get('Repository_Facet_Composer_ContentDisposition_Attachment')]
+            ],
+            value: me.contentDisposition,
+            queryMode: 'local'
           }
         ]
       }

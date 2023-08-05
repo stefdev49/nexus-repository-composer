@@ -14,41 +14,37 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+/*global Ext, NX*/
+
 /**
- * Configuration specific to apt repositories.
+ * Composer repository search contribution.
  *
- * @since 3.17
+ * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.facet.ComposerHostedFacet', {
-  extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-composerui-repository-composerhosted-facet',
+Ext.define('NX.coreui.controller.SearchComposer', {
+  extend: 'NX.app.Controller',
   requires: [
     'NX.I18n'
   ],
+
   /**
    * @override
    */
-  initComponent: function() {
-    var me = this;
+  init: function() {
+    var me = this,
+        search = me.getController('NX.coreui.controller.Search');
 
-    me.items = [
-      {
-        xtype: 'fieldset',
-        cls: 'nx-form-section',
-        title: NX.I18n.get('Repository_Facet_ComposerFacet_Title'),
-        items: [
-          {
-            xtype:'textfield',
-            name: 'attributes.composer.distribution',
-            fieldLabel: NX.I18n.get('Repository_Facet_ComposerFacet_Distribution_FieldLabel'),
-            helpText: NX.I18n.get('Repository_Facet_ComposerFacet_Distribution_HelpText'),
-            allowBlank: false
-          }
-        ]
-      }
-    ];
-
-    me.callParent();
+    search.registerFilter({
+      id: 'composer',
+      name: 'Composer',
+      text: NX.I18n.get('SearchComposer_Text'),
+      description: NX.I18n.get('SearchComposer_Description'),
+      readOnly: true,
+      criterias: [
+        { id: 'format', value: 'composer', hidden: true },
+        { id: 'name.composer' }
+      ]
+    }, me);
   }
 
 });
