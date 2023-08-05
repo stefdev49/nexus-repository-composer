@@ -21,7 +21,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.controller.SearchComposer', {
+Ext.define('NX.composer.controller.SearchComposer', {
   extend: 'NX.app.Controller',
   requires: [
     'NX.I18n'
@@ -32,7 +32,7 @@ Ext.define('NX.coreui.controller.SearchComposer', {
    */
   init: function() {
     var me = this,
-        search = me.getController('NX.coreui.controller.Search');
+        search = me.getController('NX.composer.controller.Search');
 
     search.registerFilter({
       id: 'composer',

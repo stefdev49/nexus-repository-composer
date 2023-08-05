@@ -21,15 +21,15 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.recipe.ComposerHosted', {
-  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
-  alias: 'widget.nx-coreui-repository-composer-hosted',
+Ext.define('NX.composer.view.repository.recipe.ComposerHosted', {
+  extend: 'NX.composer.view.repository.RepositorySettingsForm',
+  alias: 'widget.nx-composer-repository-composer-hosted',
   requires: [
-    'NX.coreui.view.repository.facet.ReplicationFacet',
-    'NX.coreui.view.repository.facet.ComposerFacet',
-    'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.StorageFacetHosted',
-    'NX.coreui.view.repository.facet.CleanupPolicyFacet'
+    'NX.composer.view.repository.facet.ReplicationFacet',
+    'NX.composer.view.repository.facet.ComposerFacet',
+    'NX.composer.view.repository.facet.StorageFacet',
+    'NX.composer.view.repository.facet.StorageFacetHosted',
+    'NX.composer.view.repository.facet.CleanupPolicyFacet'
   ],
 
   /**
@@ -39,11 +39,11 @@ Ext.define('NX.coreui.view.repository.recipe.ComposerHosted', {
     var me = this;
 
     me.items = [
-      {xtype: 'nx-coreui-repository-replication-facet'},
-      {xtype: 'nx-coreui-repository-composer-facet'},
-      {xtype: 'nx-coreui-repository-storage-facet', strictContentTypeValidation: false},
-      {xtype: 'nx-coreui-repository-storage-hosted-facet', writePolicy: 'ALLOW'},
-      {xtype: 'nx-coreui-repository-cleanup-policy-facet'}
+      {xtype: 'nx-composer-repository-replication-facet'},
+      {xtype: 'nx-composer-repository-composer-facet'},
+      {xtype: 'nx-composer-repository-storage-facet', strictContentTypeValidation: false},
+      {xtype: 'nx-composer-repository-storage-hosted-facet', writePolicy: 'ALLOW'},
+      {xtype: 'nx-composer-repository-cleanup-policy-facet'}
     ];
 
     me.callParent();

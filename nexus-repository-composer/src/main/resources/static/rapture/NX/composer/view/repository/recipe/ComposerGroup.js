@@ -21,14 +21,14 @@
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.recipe.ComposerGroup', {
-  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
-  alias: 'widget.nx-coreui-repository-composer-group',
+Ext.define('NX.composer.view.repository.recipe.ComposerGroup', {
+  extend: 'NX.composer.view.repository.RepositorySettingsForm',
+  alias: 'widget.nx-composer-repository-composer-group',
   requires: [
-    'NX.coreui.view.repository.facet.ReplicationFacet',
-    'NX.coreui.view.repository.facet.ComposerFacet',
-    'NX.coreui.view.repository.facet.StorageFacet',
-    'NX.coreui.view.repository.facet.GroupFacet'
+    'NX.composer.view.repository.facet.ReplicationFacet',
+    'NX.composer.view.repository.facet.ComposerFacet',
+    'NX.composer.view.repository.facet.StorageFacet',
+    'NX.composer.view.repository.facet.GroupFacet'
   ],
 
   /**
@@ -38,10 +38,10 @@ Ext.define('NX.coreui.view.repository.recipe.ComposerGroup', {
     var me = this;
 
     me.items = [
-      {xtype: 'nx-coreui-repository-replication-facet'},
-      {xtype: 'nx-coreui-repository-composer-facet'},
-      {xtype: 'nx-coreui-repository-storage-facet'},
-      {xtype: 'nx-coreui-repository-group-facet', format: 'composer' }
+      {xtype: 'nx-composer-repository-replication-facet'},
+      {xtype: 'nx-composer-repository-composer-facet'},
+      {xtype: 'nx-composer-repository-storage-facet'},
+      {xtype: 'nx-composer-repository-group-facet', format: 'composer' }
     ];
 
     me.callParent();
