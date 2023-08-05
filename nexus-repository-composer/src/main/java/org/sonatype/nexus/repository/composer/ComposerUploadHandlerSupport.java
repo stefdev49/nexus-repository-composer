@@ -12,30 +12,20 @@
  */
 package org.sonatype.nexus.repository.composer;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.importtask.ImportFileConfiguration;
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
+import org.sonatype.nexus.repository.importtask.ImportFileConfiguration;
 import org.sonatype.nexus.repository.rest.UploadDefinitionExtension;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.VariableResolverAdapter;
-import org.sonatype.nexus.repository.upload.AssetUpload;
-import org.sonatype.nexus.repository.upload.ComponentUpload;
-import org.sonatype.nexus.repository.upload.UploadDefinition;
-import org.sonatype.nexus.repository.upload.UploadFieldDefinition;
+import org.sonatype.nexus.repository.upload.*;
 import org.sonatype.nexus.repository.upload.UploadFieldDefinition.Type;
-import org.sonatype.nexus.repository.upload.UploadHandlerSupport;
-import org.sonatype.nexus.repository.upload.UploadRegexMap;
-import org.sonatype.nexus.repository.upload.UploadResponse;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.PartPayload;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -43,17 +33,26 @@ import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 
 /**
  * Common base for composer upload handlers
- *
- * @since 3.24
+ * The package name consists of a vendor name and a project name joined by a /
  */
 public abstract class ComposerUploadHandlerSupport
     extends UploadHandlerSupport
 {
   protected static final String FILENAME = "filename";
 
-  protected static final String DIRECTORY = "directory";
+  protected static final String FILENAME_HELP_TEXT = "Filename of the uploaded zip file";
 
-  protected static final String DIRECTORY_HELP_TEXT = "Destination for uploaded files (e.g. /path/to/files/)";
+  protected static final String VENDOR = "vendor";
+
+  protected static final String VENDOR_HELP_TEXT = "Component Vendor";
+
+  protected static final String PROJECT = "project";
+
+  protected static final String NAME_HELP_TEXT = "Component Project";
+
+  protected static final String VERSION = "version";
+
+  protected static final String VERSION_HELP_TEXT = "Component Version";
 
   protected static final String FIELD_GROUP_NAME = "Component attributes";
 
@@ -65,7 +64,7 @@ public abstract class ComposerUploadHandlerSupport
 
   protected UploadDefinition definition;
 
-  public ComposerUploadHandlerSupport(
+  protected ComposerUploadHandlerSupport(
       final ContentPermissionChecker contentPermissionChecker,
       final VariableResolverAdapter variableResolverAdapter,
       final Set<UploadDefinitionExtension> uploadDefinitionExtensions,
@@ -79,13 +78,17 @@ public abstract class ComposerUploadHandlerSupport
 
   @Override
   public UploadResponse handle(final Repository repository, final ComponentUpload upload) throws IOException {
-    String basePath = upload.getFields().get(DIRECTORY).trim();
+    log.info("Handling component upload for repository {}", repository.getName());
+
+    String vendor = upload.getFields().get(VENDOR).trim();
+    String project = upload.getFields().get(PROJECT).trim();
+    String version = upload.getFields().get(VERSION).trim();
 
     //Data holders for populating the UploadResponse
     Map<String,PartPayload> pathToPayload = new LinkedHashMap<>();
 
     for (AssetUpload asset : upload.getAssetUploads()) {
-      String path = normalizePath(basePath + '/' + asset.getFields().get(FILENAME).trim());
+      String path = normalizePath(vendor + '/' + project + '/' + version + '/' + vendor + '-' + project + '-' + version + ".zip");
 
       String pathWithPrefix = datastoreEnabled ? prependIfMissing(path, "/") : path;
       ensurePermitted(repository.getName(), ComposerFormat.NAME, pathWithPrefix, emptyMap());
@@ -98,8 +101,7 @@ public abstract class ComposerUploadHandlerSupport
     return new UploadResponse(responseContents, new ArrayList<>(pathToPayload.keySet()));
   }
 
-  protected abstract List<Content> getResponseContents(final Repository repository,
-                                                       final Map<String, PartPayload> pathToPayload)
+  protected abstract List<Content> getResponseContents(final Repository repository, final Map<String, PartPayload> pathToPayload)
       throws IOException;
 
   @Override
@@ -140,10 +142,14 @@ public abstract class ComposerUploadHandlerSupport
   @Override
   public UploadDefinition getDefinition() {
     if (definition == null) {
-      definition = getDefinition(ComposerFormat.NAME, true,
-          singletonList(new UploadFieldDefinition(DIRECTORY, DIRECTORY_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME)),
-          singletonList(new UploadFieldDefinition(FILENAME, false, Type.STRING)),
-          new UploadRegexMap("(.*)", FILENAME));
+      List<UploadFieldDefinition> componentFields = new ArrayList<>();
+      componentFields.add(new UploadFieldDefinition(VENDOR, VENDOR_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
+      componentFields.add(new UploadFieldDefinition(PROJECT, NAME_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
+      componentFields.add(new UploadFieldDefinition(VERSION, VERSION_HELP_TEXT, false, Type.STRING, FIELD_GROUP_NAME));
+      definition = getDefinition(ComposerFormat.NAME, false,
+           componentFields,
+          singletonList(new UploadFieldDefinition(FILENAME, FILENAME_HELP_TEXT, false, Type.STRING)),
+          new UploadRegexMap("(.*).[zZ][iI][pP]", FILENAME));
     }
     return definition;
   }
