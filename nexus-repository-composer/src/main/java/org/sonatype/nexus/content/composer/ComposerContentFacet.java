@@ -29,7 +29,7 @@ import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 
 /**
- * Provides persistent content for the 'raw' format.
+ * Provides persistent content for the 'composer' format.
  *
  * @since 3.24
  */

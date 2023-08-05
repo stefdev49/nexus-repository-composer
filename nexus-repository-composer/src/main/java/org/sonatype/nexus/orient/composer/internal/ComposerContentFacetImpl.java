@@ -73,7 +73,7 @@ public class ComposerContentFacetImpl
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
   }
 
-  // TODO: raw does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
+  // TODO: composer does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
   // TODO: as FacetSupport subclass depends on it. Actually, this facet does not need any kind of configuration
   // TODO: it's here only to circumvent this OSGi/maven-bundle-plugin issue.
   @Override
@@ -201,7 +201,7 @@ public class ComposerContentFacetImpl
       }
     }
     if (asset == null) {
-      log.debug("Attempting to set cache info for non-existent raw component {}", path);
+      log.debug("Attempting to set cache info for non-existent composer component {}", path);
       return;
     }
 

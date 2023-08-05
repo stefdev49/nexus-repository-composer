@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-present Sonatype, Inc.
+ * Copyright (c) 2018-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,21 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.content.composer.internal.browse;
-
-import javax.inject.Named;
-
-import org.sonatype.nexus.repository.content.browse.store.FormatBrowseModule;
-import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
+/*global Ext, NX*/
 
 /**
- * Configures the browse bindings for the composer format.
- *
- * @since 3.26
+ * Composer plugin strings.
  */
-@Named(ComposerFormat.NAME)
-public class ComposerBrowseModule
-    extends FormatBrowseModule<ComposerBrowseNodeDAO>
-{
-  // nothing to add...
-}
+Ext.define('NX.composer.app.PluginStrings', {
+  '@aggregate_priority': 90,
+
+  singleton: true,
+  requires: [
+    'NX.I18n'
+  ],
+
+  keys: {
+    SearchComposer_Group: 'Composer Repositories',
+    SearchComposer_Text: 'Composer',
+    SearchComposer_Description: 'Search for components in Composer repositories'
+  }
+}, function(self) {
+  NX.I18n.register(self);
+});

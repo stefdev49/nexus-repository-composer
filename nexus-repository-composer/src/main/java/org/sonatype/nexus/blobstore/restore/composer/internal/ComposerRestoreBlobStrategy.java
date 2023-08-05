@@ -37,7 +37,7 @@ import static org.sonatype.nexus.common.app.FeatureFlags.DATASTORE_ENABLED;
 /**
  * @since 3.29
  */
-@Named("raw")
+@Named("composer")
 @FeatureFlag(name = DATASTORE_ENABLED)
 @Singleton
 public class ComposerRestoreBlobStrategy
@@ -71,8 +71,8 @@ public class ComposerRestoreBlobStrategy
   @Override
   protected void createAssetFromBlob(final Blob assetBlob, final DataStoreRestoreBlobData data) throws IOException
   {
-    ComposerContentFacet rawContentFacet = data.getRepository().facet(ComposerContentFacet.class);
-    rawContentFacet.put(data.getBlobName(), new DetachedBlobPayload(assetBlob));
+    ComposerContentFacet composerContentFacet = data.getRepository().facet(ComposerContentFacet.class);
+    composerContentFacet.put(data.getBlobName(), new DetachedBlobPayload(assetBlob));
   }
 
   @Override

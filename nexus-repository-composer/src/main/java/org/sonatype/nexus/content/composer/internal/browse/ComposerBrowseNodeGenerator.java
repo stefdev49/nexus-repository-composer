@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.content.browse.AssetPathBrowseNodeGenerator
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
 
 /**
- * RAW places components at the same level as their assets.
+ * COMPOSER places components at the same level as their assets.
  *
  * @since 3.26
  */

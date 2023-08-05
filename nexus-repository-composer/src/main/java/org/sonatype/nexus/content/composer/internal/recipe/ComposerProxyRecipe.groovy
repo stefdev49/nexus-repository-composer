@@ -56,7 +56,7 @@ import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.an
 class ComposerProxyRecipe
     extends ComposerRecipeSupport
 {
-  public static final String NAME = 'raw-proxy'
+  public static final String NAME = 'composer-proxy'
   public static final String PATH_NAME = 'path'
 
   @Inject

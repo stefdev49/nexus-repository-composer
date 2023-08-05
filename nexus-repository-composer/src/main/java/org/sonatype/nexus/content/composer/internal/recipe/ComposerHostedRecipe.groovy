@@ -44,7 +44,7 @@ import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.an
 class ComposerHostedRecipe
     extends ComposerRecipeSupport
 {
-  public static final String NAME = 'raw-hosted'
+  public static final String NAME = 'composer-hosted'
 
   @Inject
   ComposerHostedRecipe(@Named(HostedType.NAME) final Type type,

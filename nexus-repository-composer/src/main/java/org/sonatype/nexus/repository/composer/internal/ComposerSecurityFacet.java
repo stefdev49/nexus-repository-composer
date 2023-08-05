@@ -10,21 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.content.composer.internal.browse;
+package org.sonatype.nexus.repository.composer.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.content.browse.store.FormatBrowseModule;
-import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
+import org.sonatype.nexus.repository.security.ContentPermissionChecker;
+import org.sonatype.nexus.repository.security.SecurityFacetSupport;
+import org.sonatype.nexus.repository.security.VariableResolverAdapter;
 
 /**
- * Configures the browse bindings for the composer format.
+ * COMPOSER security facet.
  *
- * @since 3.26
+ * @since 3.0
  */
-@Named(ComposerFormat.NAME)
-public class ComposerBrowseModule
-    extends FormatBrowseModule<ComposerBrowseNodeDAO>
+@Named
+public class ComposerSecurityFacet
+    extends SecurityFacetSupport
 {
-  // nothing to add...
+  @Inject
+  public ComposerSecurityFacet(final ComposerFormatSecurityContributor securityContributor,
+                          @Named("simple") final VariableResolverAdapter variableResolverAdapter,
+                          final ContentPermissionChecker contentPermissionChecker)
+  {
+    super(securityContributor, variableResolverAdapter, contentPermissionChecker);
+  }
 }

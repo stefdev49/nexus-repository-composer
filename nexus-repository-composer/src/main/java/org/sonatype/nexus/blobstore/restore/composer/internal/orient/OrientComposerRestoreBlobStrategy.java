@@ -43,7 +43,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
 /**
  * @since 3.15
  */
-@Named("raw")
+@Named("composer")
 @Priority(Integer.MAX_VALUE)
 @Singleton
 public class OrientComposerRestoreBlobStrategy

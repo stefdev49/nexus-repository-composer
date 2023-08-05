@@ -52,15 +52,6 @@ public class ComposerProxyFacet
     return new EscapeHelper().uriSegments(removeSlashPrefix(assetPath(context)));
   }
 
-  @Override
-  protected String encodeUrl(final String url) throws UnsupportedEncodingException {
-    String encodedUrl = url;
-    for (String ch : CHARS_TO_ENCODE) {
-      encodedUrl = encodedUrl.replace(ch, URLEncoder.encode(ch, "UTF-8"));
-    }
-    return encodedUrl;
-  }
-
   private ComposerContentFacet content() {
     return getRepository().facet(ComposerContentFacet.class);
   }

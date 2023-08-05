@@ -42,7 +42,7 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 class ComposerGroupRecipe
     extends ComposerRecipeSupport
 {
-  public static final String NAME = 'raw-group'
+  public static final String NAME = 'composer-group'
 
   @Inject
   Provider<GroupFacet> groupFacet

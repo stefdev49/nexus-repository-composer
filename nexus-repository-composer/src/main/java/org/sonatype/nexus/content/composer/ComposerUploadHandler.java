@@ -39,7 +39,7 @@ import org.sonatype.nexus.repository.view.payloads.TempBlobPayload;
 import com.google.common.collect.Lists;
 
 /**
- * Support for uploading raw components via UI & API
+ * Support for uploading composer components via UI & API
  *
  * @since 3.24
  */

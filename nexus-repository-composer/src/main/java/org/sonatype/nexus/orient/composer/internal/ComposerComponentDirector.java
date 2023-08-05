@@ -22,7 +22,7 @@ import org.sonatype.nexus.repository.storage.ComponentDirector;
 /**
  * @since 3.10
  */
-@Named("raw")
+@Named("composer")
 @Singleton
 public class ComposerComponentDirector
     implements ComponentDirector

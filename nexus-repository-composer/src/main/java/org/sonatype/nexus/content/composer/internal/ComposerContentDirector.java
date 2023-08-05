@@ -22,7 +22,7 @@ import org.sonatype.nexus.repository.content.fluent.FluentComponent;
 /**
  * @since 3.27
  */
-@Named("raw")
+@Named("composer")
 @Singleton
 public class ComposerContentDirector
     implements ContentDirector

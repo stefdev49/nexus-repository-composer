@@ -33,7 +33,7 @@ import org.sonatype.nexus.transaction.UnitOfWork;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
 /**
- * A {@link ReplicationFacet} for raw content running with orient.
+ * A {@link ReplicationFacet} for composer content running with orient.
  *
  * @since 3.31
  */
@@ -58,9 +58,9 @@ public class OrientComposerReplicationFacet
 
   @TransactionalStoreBlob
   protected void putPreservingAllAttributes(final String path, final AssetBlob assetBlob, @Nullable final AttributesMap contentAttributes) {
-    ComposerContentFacet rawContentFacet = facet(ComposerContentFacet.class);
+    ComposerContentFacet composerContentFacet = facet(ComposerContentFacet.class);
     StorageTx tx = UnitOfWork.currentTx();
-    Asset asset = rawContentFacet.getOrCreateAsset(getRepository(), path, ComposerCoordinatesHelper.getGroup(path), path);
+    Asset asset = composerContentFacet.getOrCreateAsset(getRepository(), path, ComposerCoordinatesHelper.getGroup(path), path);
     tx.attachBlob(asset, assetBlob);
     asset.attributes((NestedAttributesMap) contentAttributes);
     tx.saveAsset(asset);

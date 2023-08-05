@@ -10,21 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.content.composer.internal.browse;
+package org.sonatype.nexus.repository.composer.internal;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.content.browse.store.FormatBrowseModule;
-import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
+import org.sonatype.nexus.repository.Format;
 
 /**
- * Configures the browse bindings for the composer format.
+ * COMPOSER repository format.
  *
- * @since 3.26
+ * @since 3.0
  */
 @Named(ComposerFormat.NAME)
-public class ComposerBrowseModule
-    extends FormatBrowseModule<ComposerBrowseNodeDAO>
+@Singleton
+public class ComposerFormat
+    extends Format
 {
-  // nothing to add...
+  public static final String NAME = "composer";
+
+  public ComposerFormat() {
+    super(NAME);
+  }
 }

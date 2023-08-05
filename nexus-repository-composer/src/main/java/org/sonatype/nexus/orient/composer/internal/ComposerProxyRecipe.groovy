@@ -70,7 +70,7 @@ import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.an
 class ComposerProxyRecipe
     extends RecipeSupport
 {
-  public static final String NAME = 'raw-proxy'
+  public static final String NAME = 'composer-proxy'
 
   @Inject
   Provider<ComposerSecurityFacet> securityFacet
@@ -88,7 +88,7 @@ class ComposerProxyRecipe
   Provider<ComposerProxyFacet> proxyFacet
 
   @Inject
-  Provider<ComposerContentFacetImpl> rawContentFacet
+  Provider<ComposerContentFacetImpl> composerContentFacet
 
   @Inject
   Provider<StorageFacet> storageFacet
@@ -161,7 +161,7 @@ class ComposerProxyRecipe
     repository.attach(httpClientFacet.get())
     repository.attach(negativeCacheFacet.get())
     repository.attach(proxyFacet.get())
-    repository.attach(rawContentFacet.get())
+    repository.attach(composerContentFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(attributesFacet.get())
     repository.attach(componentMaintenance.get())

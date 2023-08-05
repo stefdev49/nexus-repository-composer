@@ -64,7 +64,7 @@ import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.an
 class ComposerHostedRecipe
     extends RecipeSupport
 {
-  public static final String NAME = 'raw-hosted'
+  public static final String NAME = 'composer-hosted'
 
   @Inject
   Provider<ComposerSecurityFacet> securityFacet
@@ -73,7 +73,7 @@ class ComposerHostedRecipe
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
-  Provider<ComposerContentFacetImpl> rawContentFacet
+  Provider<ComposerContentFacetImpl> composerContentFacet
 
   @Inject
   Provider<StorageFacet> storageFacet
@@ -109,7 +109,7 @@ class ComposerHostedRecipe
   UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
-  ComposerContentHandler rawContentHandler
+  ComposerContentHandler composerContentHandler
 
   @Inject
   ConditionalRequestHandler conditionalRequestHandler
@@ -137,7 +137,7 @@ class ComposerHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(rawContentFacet.get())
+    repository.attach(composerContentFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(attributesFacet.get())
     repository.attach(componentMaintenance.get())
@@ -173,7 +173,7 @@ class ComposerHostedRecipe
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
         .handler(lastDownloadedHandler)
-        .handler(rawContentHandler)
+        .handler(composerContentHandler)
         .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())

@@ -31,7 +31,7 @@ import static org.sonatype.nexus.repository.content.AttributeOperation.SET;
 import static org.sonatype.nexus.repository.replication.ReplicationUtils.getChecksumsFromProperties;
 
 /**
- * A {@link ReplicationFacet} for raw content.
+ * A {@link ReplicationFacet} for composer content.
  *
  * @since 3.24
  */

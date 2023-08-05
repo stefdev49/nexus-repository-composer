@@ -10,21 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.content.composer.internal.browse;
+package org.sonatype.nexus.repository.composer.rest;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.content.browse.store.FormatBrowseModule;
-import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
+import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.rest.api.HostedRepositoryApiRequestToConfigurationConverter;
+
+import static org.sonatype.nexus.repository.composer.rest.ComposerAttributes.CONTENT_DISPOSITION;
 
 /**
- * Configures the browse bindings for the composer format.
- *
- * @since 3.26
+ * @since 3.25
  */
-@Named(ComposerFormat.NAME)
-public class ComposerBrowseModule
-    extends FormatBrowseModule<ComposerBrowseNodeDAO>
+@Named
+public class ComposerHostedRepositoryApiRequestToConfigurationConverter
+    extends HostedRepositoryApiRequestToConfigurationConverter<ComposerHostedRepositoryApiRequest>
 {
-  // nothing to add...
+  @Override
+  public Configuration convert(final ComposerHostedRepositoryApiRequest request) {
+    Configuration configuration = super.convert(request);
+    configuration.attributes("composer").set(CONTENT_DISPOSITION, request.getComposer().getContentDisposition().name());
+    return configuration;
+  }
 }

@@ -59,15 +59,6 @@ public class ComposerProxyFacet
     return new EscapeHelper().uriSegments(componentPath(context));
   }
 
-  @Override
-  protected String encodeUrl(final String url) throws UnsupportedEncodingException {
-    String encodedUrl = url;
-    for (String ch : CHARS_TO_ENCODE) {
-      encodedUrl = encodedUrl.replace(ch, URLEncoder.encode(ch, "UTF-8"));
-    }
-    return encodedUrl;
-  }
-
   /**
    * Determines what 'component' this request relates to.
    */
