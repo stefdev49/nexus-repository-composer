@@ -20,7 +20,6 @@ Ext.define('NX.composer.view.repository.recipe.ComposerGroup', {
   alias: 'widget.nx-coreui-repository-composer-group',
   requires: [
     'NX.coreui.view.repository.facet.ReplicationFacet',
-    'NX.coreui.view.repository.facet.ComposerFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
     'NX.coreui.view.repository.facet.GroupFacet'
   ],
@@ -33,7 +32,6 @@ Ext.define('NX.composer.view.repository.recipe.ComposerGroup', {
 
     me.items = [
       {xtype: 'nx-coreui-repository-replication-facet'},
-      {xtype: 'nx-coreui-repository-composer-facet'},
       {xtype: 'nx-coreui-repository-storage-facet'},
       {xtype: 'nx-coreui-repository-group-facet', format: 'composer' }
     ];
