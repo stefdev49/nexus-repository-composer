@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.content.raw.internal.recipe
+package org.sonatype.nexus.content.composer.internal.recipe
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -24,7 +24,7 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
-import org.sonatype.nexus.repository.raw.internal.RawFormat
+import org.sonatype.nexus.repository.composer.internal.ComposerFormat
 import org.sonatype.nexus.repository.types.GroupType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
@@ -33,14 +33,14 @@ import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 /**
- * Raw group repository recipe.
+ * Composer group repository recipe.
  *
  * @since 3.24
  */
-@Named(RawGroupRecipe.NAME)
+@Named(ComposerGroupRecipe.NAME)
 @Singleton
-class RawGroupRecipe
-    extends RawRecipeSupport
+class ComposerGroupRecipe
+    extends ComposerRecipeSupport
 {
   public static final String NAME = 'raw-group'
 
@@ -51,8 +51,8 @@ class RawGroupRecipe
   GroupHandler groupHandler
 
   @Inject
-  RawGroupRecipe(@Named(GroupType.NAME) final Type type,
-                 @Named(RawFormat.NAME) final Format format)
+  ComposerGroupRecipe(@Named(GroupType.NAME) final Type type,
+                      @Named(ComposerFormat.NAME) final Format format)
   {
     super(type, format)
   }
