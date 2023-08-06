@@ -13,8 +13,18 @@
 package org.sonatype.nexus.content.composer.internal.recipe
 
 import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
+import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
-import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
+import org.sonatype.nexus.repository.search.ElasticSearchFacet
+import org.sonatype.nexus.repository.security.SecurityHandler
+import org.sonatype.nexus.repository.storage.SingleAssetComponentMaintenance
+import org.sonatype.nexus.repository.storage.StorageFacet
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
+import org.sonatype.nexus.repository.view.handlers.LastDownloadedHandler
+import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.TimingHandler
 
 import javax.annotation.Nonnull
 import javax.annotation.Priority
@@ -28,7 +38,6 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.cache.NegativeCacheFacet
 import org.sonatype.nexus.repository.cache.NegativeCacheHandler
-import org.sonatype.nexus.repository.http.HttpMethods
 import org.sonatype.nexus.repository.http.PartialFetchHandler
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.proxy.ProxyHandler
@@ -37,17 +46,13 @@ import org.sonatype.nexus.repository.composer.internal.ComposerFormat
 import org.sonatype.nexus.repository.routing.RoutingRuleHandler
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.handlers.HandlerContributor
-import org.sonatype.nexus.repository.view.matchers.ActionMatcher
-import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
-import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
+
 
 /**
  * Composer proxy repository recipe.
@@ -63,6 +68,12 @@ class ComposerProxyRecipe
   public static final String NAME = 'composer-proxy'
 
   @Inject
+  Provider<ComposerSecurityFacet> securityFacet
+
+  @Inject
+  Provider<ConfigurableViewFacet> viewFacet
+
+  @Inject
   Provider<HttpClientFacet> httpClientFacet
 
   @Inject
@@ -72,7 +83,31 @@ class ComposerProxyRecipe
   Provider<ComposerProxyFacet> proxyFacet
 
   @Inject
+  Provider<ComposerContentFacetImpl> composerContentFacet
+
+  @Inject
+  Provider<StorageFacet> storageFacet
+
+  @Inject
+  Provider<AttributesFacet> attributesFacet
+
+  @Inject
+  Provider<SingleAssetComponentMaintenance> componentMaintenance
+
+  @Inject
+  Provider<ElasticSearchFacet> searchFacet
+
+  @Inject
   Provider<PurgeUnusedFacet> purgeUnusedFacet
+
+  @Inject
+  ExceptionHandler exceptionHandler
+
+  @Inject
+  TimingHandler timingHandler
+
+  @Inject
+  SecurityHandler securityHandler
 
   @Inject
   NegativeCacheHandler negativeCacheHandler
@@ -81,10 +116,19 @@ class ComposerProxyRecipe
   PartialFetchHandler partialFetchHandler
 
   @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
   ProxyHandler proxyHandler
 
   @Inject
   ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
+
+  @Inject
+  LastDownloadedHandler lastDownloadedHandler
 
   @Inject
   HandlerContributor handlerContributor
@@ -93,15 +137,14 @@ class ComposerProxyRecipe
   RoutingRuleHandler routingRuleHandler
 
   @Inject
-  ComposerContentHandler composerContentHandler
+  org.sonatype.nexus.content.composer.internal.recipe.ComposerContentHandler composerContentHandler
 
   @Inject
   ComposerProviderHandler composerProviderHandler
 
   @Inject
   ComposerProxyRecipe(@Named(ProxyType.NAME) final Type type,
-                 @Named(ComposerFormat.NAME) final Format format
-  )
+                      @Named(ComposerFormat.NAME) final Format format)
   {
     super(type, format)
   }
@@ -113,10 +156,11 @@ class ComposerProxyRecipe
     repository.attach(httpClientFacet.get())
     repository.attach(negativeCacheFacet.get())
     repository.attach(proxyFacet.get())
-    repository.attach(contentFacet.get())
-    repository.attach(maintenanceFacet.get())
+    repository.attach(composerContentFacet.get())
+    repository.attach(storageFacet.get())
+    repository.attach(attributesFacet.get())
+    repository.attach(componentMaintenance.get())
     repository.attach(searchFacet.get())
-    repository.attach(browseFacet.get())
     repository.attach(purgeUnusedFacet.get())
   }
 
@@ -194,9 +238,7 @@ class ComposerProxyRecipe
             .handler(proxyHandler)
             .create())
 
-    addBrowseUnsupportedRoute(builder)
-
-    builder.defaultHandlers(HttpHandlers.notFound())
+    builder.defaultHandlers(notFound())
 
     facet.configure(builder.create())
 

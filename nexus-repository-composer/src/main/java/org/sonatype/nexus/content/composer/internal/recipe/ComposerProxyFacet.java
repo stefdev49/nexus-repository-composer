@@ -30,6 +30,7 @@ import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.content.facet.ContentProxyFacetSupport;
+import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.*;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
@@ -52,7 +53,7 @@ import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipe
  */
 @Named
 public class ComposerProxyFacet
-    extends ContentProxyFacetSupport
+    extends ProxyFacetSupport
 {
   private static final String PACKAGES_JSON = "packages.json";
 
