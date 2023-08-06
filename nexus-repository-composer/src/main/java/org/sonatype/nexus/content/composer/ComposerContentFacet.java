@@ -18,6 +18,8 @@ import java.util.Optional;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.cache.CacheInfo;
+import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.content.fluent.FluentAsset;
 import org.sonatype.nexus.repository.view.Content;
@@ -41,6 +43,12 @@ public interface ComposerContentFacet
 
   Optional<Content> get(String path) throws IOException;
 
+  Content put(String path, Payload payload, AssetKind assetKind) throws IOException;
+
+  Content put(String path, Payload payload, String sourceType, String sourceUrl, String sourceReference)
+          throws IOException;
+
+  void setCacheInfo(String path, Content content, CacheInfo cacheInfo) throws IOException;
   FluentAsset getOrCreateAsset(Repository repository, String componentName, String componentGroup, String assetName);
 
   Content put(String path, Payload content) throws IOException;

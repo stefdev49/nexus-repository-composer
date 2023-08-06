@@ -137,11 +137,10 @@ class ComposerHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(composerContentFacet.get())
-    repository.attach(storageFacet.get())
-    repository.attach(attributesFacet.get())
-    repository.attach(componentMaintenance.get())
+    repository.attach(contentFacet.get())
+    repository.attach(maintenanceFacet.get())
     repository.attach(searchFacet.get())
+    repository.attach(browseFacet.get())
     repository.attach(replicationFacet.get())
   }
 
@@ -173,7 +172,7 @@ class ComposerHostedRecipe
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
         .handler(lastDownloadedHandler)
-        .handler(composerContentHandler)
+        .handler(contentHandler)
         .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())

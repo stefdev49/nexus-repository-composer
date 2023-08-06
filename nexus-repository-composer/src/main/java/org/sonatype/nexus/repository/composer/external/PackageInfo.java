@@ -17,11 +17,10 @@ public class PackageInfo {
     public String filename;
     public String name;
 
-    public PackageInfo(String vendor, String project, String version, @Nullable String filename) {
+    public PackageInfo(String vendor, String project, String version) {
         this.vendor = vendor;
         this.project = project;
         this.version = version;
-        this.filename = filename;
         this.name = this.vendor + "/" + this.project;
     }
 
@@ -59,22 +58,11 @@ public class PackageInfo {
         this.version = version;
     }
 
-    public String getFilename() {
-        return filename;
-    }
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
     public String getName() {
         return this.name;
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String setFilenameFromName() {
-        return this.filename = this.name + "-" + this.version + ".zip";
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-present Sonatype, Inc.
+ * Copyright (c) 2018-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,42 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.orient.composer.internal;
+package org.sonatype.nexus.content.composer.internal;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.sonatype.goodies.common.ComponentSupport;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.orient.composer.ComposerContentFacet;
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
-import static org.sonatype.nexus.repository.http.HttpMethods.GET;
-import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
-import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 
 /**
- * Composer content hosted handler.
- *
- * @since 3.0
+ * Handler that rewrites the content of responses containing Composer provider JSON files so that they point to the
+ * proxy repository rather than the repository being proxied.
  */
-@Named
-@Singleton
-public class ComposerContentHandler
-    extends ComponentSupport
+public class ComposerProviderHandler
     implements Handler
 {
   public static final String DO_NOT_REWRITE = "ComposerProviderHandler.doNotRewrite";
@@ -53,7 +36,7 @@ public class ComposerContentHandler
   private final ComposerJsonProcessor composerJsonProcessor;
 
   @Inject
-  public ComposerContentHandler(final ComposerJsonProcessor composerJsonProcessor) {
+  public ComposerProviderHandler(final ComposerJsonProcessor composerJsonProcessor) {
     this.composerJsonProcessor = checkNotNull(composerJsonProcessor);
   }
 
@@ -64,7 +47,7 @@ public class ComposerContentHandler
     if (!Boolean.parseBoolean(context.getRequest().getAttributes().get(DO_NOT_REWRITE, String.class))) {
       if (response.getStatus().getCode() == HttpStatus.OK && response.getPayload() != null) {
         response = HttpResponses
-                .ok(composerJsonProcessor.rewritePackageJson(context.getRepository(), response.getPayload()));
+            .ok(composerJsonProcessor.rewriteProviderJson(context.getRepository(), response.getPayload()));
       }
     }
     return response;

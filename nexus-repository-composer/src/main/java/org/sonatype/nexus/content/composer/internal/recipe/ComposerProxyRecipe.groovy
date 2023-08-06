@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.content.composer.internal.recipe
 
+import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
+import org.sonatype.nexus.repository.composer.internal.AssetKind
+import org.sonatype.nexus.repository.http.HttpHandlers
+
 import javax.annotation.Nonnull
 import javax.annotation.Priority
 import javax.inject.Inject
@@ -57,7 +61,6 @@ class ComposerProxyRecipe
     extends ComposerRecipeSupport
 {
   public static final String NAME = 'composer-proxy'
-  public static final String PATH_NAME = 'path'
 
   @Inject
   Provider<HttpClientFacet> httpClientFacet
@@ -90,6 +93,12 @@ class ComposerProxyRecipe
   RoutingRuleHandler routingRuleHandler
 
   @Inject
+  ComposerContentHandler composerContentHandler
+
+  @Inject
+  ComposerProviderHandler composerProviderHandler
+
+  @Inject
   ComposerProxyRecipe(@Named(ProxyType.NAME) final Type type,
                  @Named(ComposerFormat.NAME) final Format format
   )
@@ -117,33 +126,77 @@ class ComposerProxyRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    // Additional handlers, such as the lastDownloadHandler, are intentionally
-    // not included on this route because this route forwards to the route below.
-    // This route specifically handles GET / and forwards to /index.html.
-    builder.route(new Route.Builder()
-        .matcher(and(new ActionMatcher(HttpMethods.GET), new SuffixMatcher('/')))
-        .handler(timingHandler)
-        .handler(indexHtmlForwardHandler)
-        .create()
-    )
+    builder.route(packagesMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(negativeCacheHandler)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(proxyHandler)
+            .create())
 
-    builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('{' + PATH_NAME + ':/.+}'))
-        .handler(timingHandler)
-        .handler(contentDispositionHandler)
-        .handler(securityHandler)
-        .handler(routingRuleHandler)
-        .handler(exceptionHandler)
-        .handler(handlerContributor)
-        .handler(negativeCacheHandler)
-        .handler(conditionalRequestHandler)
-        .handler(partialFetchHandler)
-        .handler(contentHeadersHandler)
-        .handler(lastDownloadedHandler)
-        .handler(proxyHandler)
-        .create())
+    builder.route(listMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.LIST))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(negativeCacheHandler)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(proxyHandler)
+            .create())
 
-    builder.defaultHandlers(notFound())
+    builder.route(providerMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.PROVIDER))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(negativeCacheHandler)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(composerProviderHandler)
+            .handler(composerContentHandler)
+            .handler(proxyHandler)
+            .create())
+
+    builder.route(packageMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.PACKAGE))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(negativeCacheHandler)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(composerContentHandler)
+            .handler(proxyHandler)
+            .create())
+
+    builder.route(zipballMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.ZIPBALL))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(negativeCacheHandler)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(proxyHandler)
+            .create())
+
+    addBrowseUnsupportedRoute(builder)
+
+    builder.defaultHandlers(HttpHandlers.notFound())
 
     facet.configure(builder.create())
 
