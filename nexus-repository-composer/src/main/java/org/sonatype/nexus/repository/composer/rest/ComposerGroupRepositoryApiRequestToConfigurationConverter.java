@@ -17,8 +17,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.rest.GroupRepositoryApiRequestToConfigurationConverter;
 
-import static org.sonatype.nexus.repository.composer.rest.ComposerAttributes.CONTENT_DISPOSITION;
-
 /**
  * @since 3.25
  */
@@ -29,7 +27,6 @@ public class ComposerGroupRepositoryApiRequestToConfigurationConverter
   @Override
   public Configuration convert(final ComposerGroupRepositoryApiRequest request) {
     Configuration configuration = super.convert(request);
-    configuration.attributes("composer").set(CONTENT_DISPOSITION, request.getComposer().getContentDisposition().name());
     return configuration;
   }
 }

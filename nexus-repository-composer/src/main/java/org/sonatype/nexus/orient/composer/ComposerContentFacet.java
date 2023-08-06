@@ -38,7 +38,7 @@ import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
  */
 @Facet.Exposed
 public interface ComposerContentFacet
-    extends ContentFacet
+    extends Facet
 {
   @Nullable
   Content get(String path) throws IOException;

@@ -27,8 +27,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import static org.sonatype.nexus.repository.composer.ContentDisposition.ATTACHMENT;
-
 /**
  * @since 3.24
  */
@@ -36,8 +34,6 @@ import static org.sonatype.nexus.repository.composer.ContentDisposition.ATTACHME
 public class ComposerProxyRepositoryApiRequest
     extends ProxyRepositoryApiRequest
 {
-  private final ComposerAttributes composer;
-
   @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
   @SuppressWarnings("squid:S00107") // suppress constructor parameter count
   public ComposerProxyRepositoryApiRequest(
@@ -49,15 +45,9 @@ public class ComposerProxyRepositoryApiRequest
       @JsonProperty("negativeCache")  final NegativeCacheAttributes negativeCache,
       @JsonProperty("httpClient") final HttpClientAttributes httpClient,
       @JsonProperty("routingRule") final String routingRule,
-      @JsonProperty("composer") final ComposerAttributes composer,
       @JsonProperty("replication") @JsonInclude(value= Include.NON_EMPTY, content=Include.NON_NULL)
       final ReplicationAttributes replication)
   {
     super(name, ComposerFormat.NAME, online, storage, cleanup, proxy, negativeCache, httpClient, routingRule, replication);
-    this.composer = composer != null ? composer : new ComposerAttributes(ATTACHMENT);
-  }
-
-  public ComposerAttributes getComposer() {
-    return composer;
   }
 }

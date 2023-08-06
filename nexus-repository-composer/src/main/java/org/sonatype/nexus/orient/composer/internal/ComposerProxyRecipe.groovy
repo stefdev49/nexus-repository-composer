@@ -12,10 +12,8 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
-import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
 import org.sonatype.nexus.repository.composer.internal.AssetKind
-import org.sonatype.nexus.repository.http.HttpHandlers
 
 import javax.annotation.Nonnull
 import javax.annotation.Priority
@@ -36,7 +34,6 @@ import org.sonatype.nexus.repository.http.PartialFetchHandler
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.purge.PurgeUnusedFacet
-import org.sonatype.nexus.repository.composer.ContentDispositionHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
 import org.sonatype.nexus.repository.composer.internal.ComposerIndexHtmlForwardHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
@@ -147,17 +144,7 @@ class ComposerProxyRecipe
   RoutingRuleHandler routingRuleHandler
 
   @Inject
-  ContentDispositionHandler contentDispositionHandler
-
-  @Inject
-  ComposerIndexHtmlForwardHandler indexHtmlForwardHandler
-
-
-  @Inject
   org.sonatype.nexus.content.composer.internal.recipe.ComposerContentHandler composerContentHandler
-
-  @Inject
-  ComposerProviderHandler composerProviderHandler
 
   @Inject
   public ComposerProxyRecipe(final @Named(ProxyType.NAME) Type type,
@@ -178,7 +165,6 @@ class ComposerProxyRecipe
     repository.attach(attributesFacet.get())
     repository.attach(componentMaintenance.get())
     repository.attach(searchFacet.get())
-    repository.attach(browseFacet.get())
     repository.attach(purgeUnusedFacet.get())
   }
 
@@ -187,7 +173,6 @@ class ComposerProxyRecipe
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
-
     builder.route(packagesMatcher()
             .handler(timingHandler)
             .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
@@ -256,9 +241,7 @@ class ComposerProxyRecipe
             .handler(proxyHandler)
             .create())
 
-    addBrowseUnsupportedRoute(builder)
-
-    builder.defaultHandlers(HttpHandlers.notFound())
+    builder.defaultHandlers(notFound())
 
     facet.configure(builder.create())
 

@@ -19,8 +19,6 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.rest.api.ProxyRepositoryApiRequestToConfigurationConverter;
 import org.sonatype.nexus.repository.routing.RoutingRuleStore;
 
-import static org.sonatype.nexus.repository.composer.rest.ComposerAttributes.CONTENT_DISPOSITION;
-
 /**
  * @since 3.25
  */
@@ -36,7 +34,6 @@ public class ComposerProxyRepositoryApiRequestToConfigurationConverter
   @Override
   public Configuration convert(final ComposerProxyRepositoryApiRequest request) {
     Configuration configuration = super.convert(request);
-    configuration.attributes("composer").set(CONTENT_DISPOSITION, request.getComposer().getContentDisposition().name());
     return configuration;
   }
 }

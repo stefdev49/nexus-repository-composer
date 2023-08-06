@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import static org.sonatype.nexus.repository.composer.ContentDisposition.ATTACHMENT;
-
 /**
  * @since 3.24
  */
@@ -30,21 +28,13 @@ import static org.sonatype.nexus.repository.composer.ContentDisposition.ATTACHME
 public class ComposerGroupRepositoryApiRequest
     extends GroupRepositoryApiRequest
 {
-  private final ComposerAttributes composer;
-
   @JsonCreator
   public ComposerGroupRepositoryApiRequest(
       @JsonProperty("name") final String name,
       @JsonProperty("online") final Boolean online,
       @JsonProperty("storage") final StorageAttributes storage,
-      @JsonProperty("group") final GroupAttributes group,
-      @JsonProperty("composer") final ComposerAttributes composer)
+      @JsonProperty("group") final GroupAttributes group)
   {
     super(name, ComposerFormat.NAME, online, storage, group);
-    this.composer = composer != null ? composer : new ComposerAttributes(ATTACHMENT);
-  }
-
-  public ComposerAttributes getComposer() {
-    return composer;
   }
 }

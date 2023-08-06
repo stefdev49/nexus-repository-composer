@@ -31,7 +31,7 @@ import org.sonatype.nexus.repository.content.browse.BrowseFacet
 import org.sonatype.nexus.repository.content.maintenance.SingleAssetMaintenanceFacet
 import org.sonatype.nexus.repository.content.search.SearchFacet
 import org.sonatype.nexus.repository.http.PartialFetchHandler
-import org.sonatype.nexus.repository.composer.ContentDispositionHandler
+
 import org.sonatype.nexus.repository.composer.internal.ComposerIndexHtmlForwardHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -119,9 +119,6 @@ abstract class ComposerRecipeSupport
 
   @Inject
   HandlerContributor handlerContributor
-
-  @Inject
-  ContentDispositionHandler contentDispositionHandler
 
   protected ComposerRecipeSupport(final Type type, final Format format)
   {

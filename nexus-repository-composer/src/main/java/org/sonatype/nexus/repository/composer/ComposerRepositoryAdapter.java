@@ -49,8 +49,7 @@ public class ComposerRepositoryAdapter
             repository.getConfiguration().isOnline(),
             getHostedStorageAttributes(repository),
             getCleanupPolicyAttributes(repository),
-            getComponentAttributes(repository),
-            createComposerAttributes(repository));
+            getComponentAttributes(repository));
       case ProxyType.NAME:
         return new ComposerProxyApiRepository(
             repository.getName(),
@@ -62,15 +61,10 @@ public class ComposerRepositoryAdapter
             getNegativeCacheAttributes(repository),
             getHttpClientAttributes(repository),
             getRoutingRuleName(repository),
-            getReplicationAttributes(repository),
-            createComposerAttributes(repository));
+            getReplicationAttributes(repository));
       default:
         return super.adapt(repository);
     }
   }
 
-  private ComposerAttributes createComposerAttributes(final Repository repository) {
-    String disposition = repository.getConfiguration().attributes(COMPOSER).get("contentDisposition", String.class);
-    return new ComposerAttributes(disposition);
-  }
 }

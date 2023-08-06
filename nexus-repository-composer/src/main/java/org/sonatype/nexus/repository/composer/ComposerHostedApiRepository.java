@@ -29,9 +29,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComposerHostedApiRepository
     extends SimpleApiHostedRepository
 {
-  @NotNull
-  private final ComposerAttributes composer;
-
   @JsonCreator
   public ComposerHostedApiRepository(
       @JsonProperty("name") final String name,
@@ -39,14 +36,9 @@ public class ComposerHostedApiRepository
       @JsonProperty("online") final Boolean online,
       @JsonProperty("storage") final HostedStorageAttributes storage,
       @JsonProperty("cleanup") final CleanupPolicyAttributes cleanup,
-      @JsonProperty("component") final ComponentAttributes component,
-      @JsonProperty("composer") final ComposerAttributes composer)
+      @JsonProperty("component") final ComponentAttributes component)
   {
     super(name, ComposerFormat.NAME, url, online, storage, cleanup, component);
-    this.composer = composer;
   }
 
-  public ComposerAttributes getComposer() {
-    return composer;
-  }
 }

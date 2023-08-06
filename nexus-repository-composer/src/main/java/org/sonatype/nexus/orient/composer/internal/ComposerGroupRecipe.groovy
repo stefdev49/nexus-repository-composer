@@ -27,7 +27,7 @@ import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
-import org.sonatype.nexus.repository.composer.ContentDispositionHandler
+
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -84,9 +84,6 @@ class ComposerGroupRecipe
 
   @Inject
   HandlerContributor handlerContributor
-
-  @Inject
-  ContentDispositionHandler contentDispositionHandler
 
   @Inject
   ComposerGroupRecipe(@Named(GroupType.NAME) Type type,

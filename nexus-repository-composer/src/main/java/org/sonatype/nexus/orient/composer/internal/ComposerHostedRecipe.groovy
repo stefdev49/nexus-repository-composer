@@ -27,7 +27,7 @@ import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.http.HttpMethods
 import org.sonatype.nexus.repository.http.PartialFetchHandler
-import org.sonatype.nexus.repository.composer.ContentDispositionHandler
+
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
 import org.sonatype.nexus.repository.composer.internal.ComposerIndexHtmlForwardHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
@@ -124,9 +124,6 @@ class ComposerHostedRecipe
   HandlerContributor handlerContributor
 
   @Inject
-  ContentDispositionHandler contentDispositionHandler
-
-  @Inject
   ComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
                   @Named(ComposerFormat.NAME) final Format format)
   {
@@ -163,7 +160,6 @@ class ComposerHostedRecipe
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher('/{name:.+}'))
         .handler(timingHandler)
-        .handler(contentDispositionHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)

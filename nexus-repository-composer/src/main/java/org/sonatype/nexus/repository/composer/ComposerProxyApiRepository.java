@@ -33,10 +33,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComposerProxyApiRepository
     extends SimpleApiProxyRepository
 {
-
-  @NotNull
-  private final ComposerAttributes composer;
-
   public ComposerProxyApiRepository(
       @JsonProperty("name") final String name,
       @JsonProperty("url") final String url,
@@ -48,14 +44,8 @@ public class ComposerProxyApiRepository
       @JsonProperty("httpClient") final HttpClientAttributes httpClient,
       @JsonProperty("routingRuleName") final String routingRuleName,
       @JsonProperty("replication") @JsonInclude(value= Include.NON_EMPTY, content=Include.NON_NULL)
-      final ReplicationAttributes replication,
-      @JsonProperty("composer") final ComposerAttributes composer)
+      final ReplicationAttributes replication)
   {
     super(name, ComposerFormat.NAME, url, online, storage, cleanup, proxy, negativeCache, httpClient, routingRuleName, replication);
-    this.composer = composer;
-  }
-
-  public ComposerAttributes getComposer() {
-    return composer;
   }
 }
