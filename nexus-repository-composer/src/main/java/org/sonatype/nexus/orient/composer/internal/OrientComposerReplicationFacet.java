@@ -60,7 +60,11 @@ public class OrientComposerReplicationFacet
   protected void putPreservingAllAttributes(final String path, final AssetBlob assetBlob, @Nullable final AttributesMap contentAttributes) {
     ComposerContentFacet composerContentFacet = facet(ComposerContentFacet.class);
     StorageTx tx = UnitOfWork.currentTx();
-    Asset asset = composerContentFacet.getOrCreateAsset(getRepository(), path, ComposerCoordinatesHelper.getGroup(path), path);
+    String[] parts = path.split("/");
+    String vendor = parts[0];
+    String project = parts[1];
+    String version = parts[2];
+    Asset asset = composerContentFacet.getOrCreateAsset(path, vendor, project, version);
     tx.attachBlob(asset, assetBlob);
     asset.attributes((NestedAttributesMap) contentAttributes);
     tx.saveAsset(asset);

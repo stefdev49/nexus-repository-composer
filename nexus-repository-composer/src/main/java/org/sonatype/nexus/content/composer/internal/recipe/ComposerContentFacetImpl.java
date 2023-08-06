@@ -15,7 +15,6 @@ package org.sonatype.nexus.content.composer.internal.recipe;
 import org.sonatype.nexus.repository.composer.external.ComposerFormatAttributesExtractor;
 import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalStoreMetadata;
-import org.sonatype.nexus.repository.transaction.TransactionalTouchBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalTouchMetadata;
 import java.io.IOException;
 import java.util.Arrays;
@@ -23,10 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.cache.CacheInfo;
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -80,14 +76,11 @@ public class ComposerContentFacetImpl
   private static final List<HashAlgorithm> hashAlgorithms = Arrays.asList(MD5, SHA1, SHA256);
 
   private final ComposerFormatAttributesExtractor composerFormatAttributesExtractor;
-  private final Format format;
 
   @Inject
   public ComposerContentFacetImpl(@Named(ComposerFormat.NAME) final FormatStoreManager formatStoreManager,
-                                  @Named(ComposerFormat.NAME) final Format format,
                                   final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
     super(formatStoreManager);
-    this.format = checkNotNull(format);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
   }
 
@@ -164,7 +157,7 @@ public class ComposerContentFacetImpl
 
     Asset asset = findAsset(tx, path);
     if (asset == null) {
-      asset = tx.createAsset(bucket, format);
+      asset = tx.createAsset(bucket, getRepository().getFormat());
       asset.name(path);
     }
 
@@ -287,7 +280,7 @@ public class ComposerContentFacetImpl
 
     Component component = findComponent(tx, group, name, version);
     if (component == null) {
-      component = tx.createComponent(bucket, format).group(group).name(name).version(version);
+      component = tx.createComponent(bucket, getRepository().getFormat()).group(group).name(name).version(version);
       tx.saveComponent(component);
     }
 

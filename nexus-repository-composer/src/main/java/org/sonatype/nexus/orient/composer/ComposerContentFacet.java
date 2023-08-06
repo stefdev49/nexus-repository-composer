@@ -22,6 +22,7 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.cache.CacheInfo;
+import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
@@ -45,6 +46,8 @@ public interface ComposerContentFacet
 
   Content put(String path, Payload content) throws IOException;
 
+  Content put(String path, Content content, AssetKind assetKind) throws IOException;
+
   /**
    * Accepts an {@link AssetBlob}, creates an {@link Asset} if one doesn't already exist at {@code path},
    * and returns it.
@@ -62,7 +65,10 @@ public interface ComposerContentFacet
    */
   void setCacheInfo(String path, Content content, CacheInfo cacheInfo) throws IOException;
 
-  Asset getOrCreateAsset(Repository repository, String componentName, String componentGroup, String assetName);
+  Asset getOrCreateAsset(final String path,
+                         final String group,
+                         final String name,
+                         final String version);
 
   /*
    * Check for the existence of an {@link Asset} with {@code name}.

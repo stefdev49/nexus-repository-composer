@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
+import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 
@@ -145,6 +146,9 @@ class ComposerProxyRecipe
 
   @Inject
   org.sonatype.nexus.content.composer.internal.recipe.ComposerContentHandler composerContentHandler
+
+  @Inject
+  ComposerProviderHandler composerProviderHandler
 
   @Inject
   public ComposerProxyRecipe(final @Named(ProxyType.NAME) Type type,
