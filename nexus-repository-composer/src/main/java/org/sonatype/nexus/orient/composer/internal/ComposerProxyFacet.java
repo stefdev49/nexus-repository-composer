@@ -178,7 +178,7 @@ public class ComposerProxyFacet
   }
 
   private ComposerContentFacet content() {
-    return getRepository().facet(ComposerContentFacetImpl.class);
+    return getRepository().facet(ComposerContentFacet.class);
   }
 
   private Payload getPackagePayload(final Context context, String path) throws Exception {

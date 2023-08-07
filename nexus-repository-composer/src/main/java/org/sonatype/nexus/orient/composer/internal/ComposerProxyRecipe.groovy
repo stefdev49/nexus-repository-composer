@@ -14,6 +14,7 @@ package org.sonatype.nexus.orient.composer.internal
 
 import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
+import org.sonatype.nexus.orient.composer.ComposerContentFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 
 import javax.annotation.Nonnull
@@ -83,7 +84,7 @@ class ComposerProxyRecipe
   Provider<ComposerProxyFacet> proxyFacet
 
   @Inject
-  Provider<ComposerContentFacetImpl> composerContentFacet
+  Provider<ComposerContentFacet> composerContentFacet
 
   @Inject
   Provider<StorageFacet> storageFacet
