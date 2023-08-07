@@ -24,7 +24,7 @@ import org.sonatype.nexus.repository.storage.ComponentDirector;
  */
 @Named("composer")
 @Singleton
-public class ComposerComponentDirector
+public class OrientComposerComponentDirector
     implements ComponentDirector
 {
   @Override

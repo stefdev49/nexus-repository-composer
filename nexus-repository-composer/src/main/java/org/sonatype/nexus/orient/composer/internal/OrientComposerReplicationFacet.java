@@ -17,8 +17,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.orient.composer.ComposerContentFacet;
-import org.sonatype.nexus.repository.composer.ComposerCoordinatesHelper;
+import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.ComponentMaintenance;
@@ -58,13 +57,13 @@ public class OrientComposerReplicationFacet
 
   @TransactionalStoreBlob
   protected void putPreservingAllAttributes(final String path, final AssetBlob assetBlob, @Nullable final AttributesMap contentAttributes) {
-    ComposerContentFacet composerContentFacet = facet(ComposerContentFacet.class);
+    OrientComposerContentFacet orientComposerContentFacet = facet(OrientComposerContentFacet.class);
     StorageTx tx = UnitOfWork.currentTx();
     String[] parts = path.split("/");
     String vendor = parts[0];
     String project = parts[1];
     String version = parts[2];
-    Asset asset = composerContentFacet.getOrCreateAsset(path, vendor, project, version);
+    Asset asset = orientComposerContentFacet.getOrCreateAsset(path, vendor, project, version);
     tx.attachBlob(asset, assetBlob);
     asset.attributes((NestedAttributesMap) contentAttributes);
     tx.saveAsset(asset);

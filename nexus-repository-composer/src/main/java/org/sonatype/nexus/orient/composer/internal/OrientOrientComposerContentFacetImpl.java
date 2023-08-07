@@ -22,14 +22,12 @@ import javax.inject.Named;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.orient.composer.ComposerContentFacet;
+import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerFormatAttributesExtractor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.composer.ComposerCoordinatesHelper;
 import org.sonatype.nexus.repository.storage.*;
 import org.sonatype.nexus.repository.transaction.TransactionalDeleteBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
@@ -57,14 +55,14 @@ import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VER
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
 /**
- * A {@link ComposerContentFacet} that persists to a {@link StorageFacet}.
+ * A {@link OrientComposerContentFacet} that persists to a {@link StorageFacet}.
  *
  * @since 3.0
  */
 @Named
-public class ComposerContentFacetImpl
+public class OrientOrientComposerContentFacetImpl
     extends FacetSupport
-    implements ComposerContentFacet
+    implements OrientComposerContentFacet
 {
   public static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(MD5, SHA1, SHA256);
 
@@ -73,7 +71,7 @@ public class ComposerContentFacetImpl
   private final AssetEntityAdapter assetEntityAdapter;
 
   @Inject
-  public ComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter, final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
+  public OrientOrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter, final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
   }
@@ -139,12 +137,8 @@ public class ComposerContentFacetImpl
           throws IOException
   {
     StorageTx tx = UnitOfWork.currentTx();
-    String[] parts = path.split("/");
-    String vendor = parts[0];
-    String project = parts[1];
-    String version = parts[2];
-    Asset asset = getOrCreateAsset(path, vendor, project, version);
-
+    Result result = getResult(path);
+    Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
     asset.formatAttributes().set(P_ASSET_KIND, assetKind.toString());
 
     if (payload instanceof Content) {
@@ -169,11 +163,8 @@ public class ComposerContentFacetImpl
   @TransactionalStoreBlob
   public Asset put(final String path, final AssetBlob assetBlob, @Nullable final AttributesMap contentAttributes) {
     StorageTx tx = UnitOfWork.currentTx();
-    String[] parts = path.split("/");
-    String vendor = parts[0];
-    String project = parts[1];
-    String version = parts[2];
-    Asset asset = getOrCreateAsset(path, vendor, project, version);
+    Result result = getResult(path);
+    Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
     tx.attachBlob(asset, assetBlob);
     Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
     tx.saveAsset(asset);
@@ -190,14 +181,11 @@ public class ComposerContentFacetImpl
                                  final String sourceReference)
       throws IOException
   {
-    String[] parts = path.split("/");
-    String vendor = parts[0];
-    String project = parts[1];
-    String version = parts[2];
+    Result result = getResult(path);
 
     StorageTx tx = UnitOfWork.currentTx();
 
-    Asset asset = getOrCreateAsset(path, vendor, project, version);
+    Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
 
     AttributesMap contentAttributes = null;
     if (payload instanceof Content) {
@@ -215,9 +203,9 @@ public class ComposerContentFacetImpl
     try {
       asset.formatAttributes().clear();
       asset.formatAttributes().set(P_ASSET_KIND, assetKind.toString());
-      asset.formatAttributes().set(P_VENDOR, vendor);
-      asset.formatAttributes().set(P_PROJECT, project);
-      asset.formatAttributes().set(P_VERSION, version);
+      asset.formatAttributes().set(P_VENDOR, result.vendor);
+      asset.formatAttributes().set(P_PROJECT, result.project);
+      asset.formatAttributes().set(P_VERSION, result.version);
       asset.formatAttributes().set(SOURCE_TYPE_FIELD_NAME, sourceType);
       asset.formatAttributes().set(SOURCE_URL_FIELD_NAME, sourceUrl);
       asset.formatAttributes().set(SOURCE_REFERENCE_FIELD_NAME, sourceReference);
@@ -230,6 +218,38 @@ public class ComposerContentFacetImpl
     tx.saveAsset(asset);
 
     return toContent(asset, assetBlob.getBlob());
+  }
+
+  private static Result getResult(String path) {
+    String[] parts = path.split("/");
+    String vendor = parts[0];
+    String project ;
+    if (parts.length > 1) {
+      project = parts[1];
+    }
+    else {
+      project = vendor;
+    }
+    String version;
+    if (parts.length == 3) {
+      version = "latest";
+    }
+    else {
+      version = parts[2];
+    }
+    return new Result(vendor, project, version);
+  }
+
+  private static class Result {
+    public final String vendor;
+    public final String project;
+    public final String version;
+
+    public Result(String vendor, String project, String version) {
+      this.vendor = vendor;
+      this.project = project;
+      this.version = version;
+    }
   }
 
   @Override
@@ -306,11 +326,8 @@ public class ComposerContentFacetImpl
 
   // findComponent function by path. split path into group, name, version
   private Component findComponent(final StorageTx tx, final String path) {
-      String[] parts = path.split("/");
-      String group = parts[0];
-      String name = parts[1];
-      String version = parts[2];
-      return findComponent(tx, group, name, version);
+    Result result = getResult(path);
+    return findComponent(tx, result.vendor, result.project, result.version);
   }
 
   private Component findComponent(final StorageTx tx, final String group, final String name, final String version) {

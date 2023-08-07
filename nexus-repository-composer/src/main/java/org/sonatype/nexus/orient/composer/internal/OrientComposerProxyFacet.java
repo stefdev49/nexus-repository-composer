@@ -21,7 +21,7 @@ import javax.inject.Named;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import org.sonatype.nexus.orient.composer.ComposerContentFacet;
+import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
@@ -38,7 +38,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.GET;
  * @since 3.0
  */
 @Named
-public class ComposerProxyFacet
+public class OrientComposerProxyFacet
     extends ProxyFacetSupport
 {
   private static final String PACKAGES_JSON = "packages.json";
@@ -48,7 +48,7 @@ public class ComposerProxyFacet
   private final ComposerJsonProcessor composerJsonProcessor;
 
   @Inject
-  public ComposerProxyFacet(ComposerJsonProcessor composerJsonProcessor) {
+  public OrientComposerProxyFacet(ComposerJsonProcessor composerJsonProcessor) {
     this.composerJsonProcessor = composerJsonProcessor;
   }
 
@@ -177,13 +177,13 @@ public class ComposerProxyFacet
     }
   }
 
-  private ComposerContentFacet content() {
-    return getRepository().facet(ComposerContentFacet.class);
+  private OrientComposerContentFacet content() {
+    return getRepository().facet(OrientComposerContentFacet.class);
   }
 
   private Payload getPackagePayload(final Context context, String path) throws Exception {
     Request request = new Request.Builder().action(GET).path(path)
-            .attribute(org.sonatype.nexus.orient.composer.internal.ComposerContentHandler.DO_NOT_REWRITE, "true").build();
+            .attribute(OrientComposerContentHandler.DO_NOT_REWRITE, "true").build();
     Response response = getRepository().facet(ViewFacet.class).dispatch(request, context);
     return response.getPayload();
   }

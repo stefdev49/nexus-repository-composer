@@ -14,7 +14,7 @@ package org.sonatype.nexus.orient.composer.internal
 
 import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
-import org.sonatype.nexus.orient.composer.ComposerContentFacet
+import org.sonatype.nexus.orient.composer.OrientComposerContentFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 
 import javax.annotation.Nonnull
@@ -60,10 +60,10 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
  *
  * @since 3.0
  */
-@Named(ComposerProxyRecipe.NAME)
+@Named(OrientComposerProxyRecipe.NAME)
 @Priority(Integer.MAX_VALUE)
 @Singleton
-class ComposerProxyRecipe
+class OrientComposerProxyRecipe
     extends ComposerRecipeSupport
 {
   public static final String NAME = 'composer-proxy'
@@ -81,10 +81,10 @@ class ComposerProxyRecipe
   Provider<NegativeCacheFacet> negativeCacheFacet
 
   @Inject
-  Provider<ComposerProxyFacet> proxyFacet
+  Provider<OrientComposerProxyFacet> proxyFacet
 
   @Inject
-  Provider<ComposerContentFacet> composerContentFacet
+  Provider<OrientComposerContentFacet> composerContentFacet
 
   @Inject
   Provider<StorageFacet> storageFacet
@@ -138,14 +138,14 @@ class ComposerProxyRecipe
   RoutingRuleHandler routingRuleHandler
 
   @Inject
-  org.sonatype.nexus.content.composer.internal.recipe.ComposerContentHandler composerContentHandler
+  OrientComposerContentHandler composerContentHandler
 
   @Inject
   ComposerProviderHandler composerProviderHandler
 
   @Inject
-  public ComposerProxyRecipe(final @Named(ProxyType.NAME) Type type,
-                             final @Named(ComposerFormat.NAME) Format format)
+  public OrientComposerProxyRecipe(final @Named(ProxyType.NAME) Type type,
+                                   final @Named(ComposerFormat.NAME) Format format)
   {
     super(type, format)
   }
@@ -180,6 +180,7 @@ class ComposerProxyRecipe
             .handler(conditionalRequestHandler)
             .handler(partialFetchHandler)
             .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
             .handler(proxyHandler)
             .create())
 
@@ -193,6 +194,7 @@ class ComposerProxyRecipe
             .handler(conditionalRequestHandler)
             .handler(partialFetchHandler)
             .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
             .handler(proxyHandler)
             .create())
 
@@ -206,6 +208,7 @@ class ComposerProxyRecipe
             .handler(conditionalRequestHandler)
             .handler(partialFetchHandler)
             .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
             .handler(composerProviderHandler)
             .handler(composerContentHandler)
             .handler(proxyHandler)
@@ -220,6 +223,7 @@ class ComposerProxyRecipe
             .handler(negativeCacheHandler)
             .handler(conditionalRequestHandler)
             .handler(partialFetchHandler)
+            .handler(unitOfWorkHandler)
             .handler(contentHeadersHandler)
             .handler(composerContentHandler)
             .handler(proxyHandler)
@@ -235,6 +239,7 @@ class ComposerProxyRecipe
             .handler(conditionalRequestHandler)
             .handler(partialFetchHandler)
             .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
             .handler(proxyHandler)
             .create())
 

@@ -18,24 +18,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.goodies.common.ComponentSupport;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.http.HttpResponses;
-import org.sonatype.nexus.orient.composer.ComposerContentFacet;
 import org.sonatype.nexus.repository.http.HttpStatus;
-import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
-import static org.sonatype.nexus.repository.http.HttpMethods.GET;
-import static org.sonatype.nexus.repository.http.HttpMethods.HEAD;
-import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 
 /**
  * Composer content hosted handler.
@@ -44,7 +35,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
  */
 @Named
 @Singleton
-public class ComposerContentHandler
+public class OrientComposerContentHandler
     extends ComponentSupport
     implements Handler
 {
@@ -53,7 +44,7 @@ public class ComposerContentHandler
   private final ComposerJsonProcessor composerJsonProcessor;
 
   @Inject
-  public ComposerContentHandler(final ComposerJsonProcessor composerJsonProcessor) {
+  public OrientComposerContentHandler(final ComposerJsonProcessor composerJsonProcessor) {
     this.composerJsonProcessor = checkNotNull(composerJsonProcessor);
   }
 

@@ -28,7 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.orient.composer.internal.ComposerContentFacetImpl;
+import org.sonatype.nexus.orient.composer.internal.OrientOrientComposerContentFacetImpl;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.importtask.ImportFileConfiguration;
 import org.sonatype.nexus.repository.composer.ComposerUploadHandlerSupport;
@@ -52,13 +52,13 @@ import com.google.common.collect.Lists;
  */
 @Named(ComposerFormat.NAME)
 @Singleton
-public class ComposerUploadHandler
+public class OrientComposerUploadHandler
     extends ComposerUploadHandlerSupport
 {
   private final MimeSupport mimeSupport;
 
   @Inject
-  public ComposerUploadHandler(
+  public OrientComposerUploadHandler(
       final ContentPermissionChecker contentPermissionChecker,
       @Named("simple") final VariableResolverAdapter variableResolverAdapter,
       final Set<UploadDefinitionExtension> uploadDefinitionExtensions,
@@ -72,7 +72,7 @@ public class ComposerUploadHandler
   protected List<Content> getResponseContents(final Repository repository, final Map<String, PartPayload> pathToPayload)
       throws IOException
   {
-    ComposerContentFacet facet = repository.facet(ComposerContentFacet.class);
+    OrientComposerContentFacet facet = repository.facet(OrientComposerContentFacet.class);
 
     List<Content> responseContents = Lists.newArrayList();
     UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
@@ -98,9 +98,9 @@ public class ComposerUploadHandler
     Path contentPath = configuration.getFile().toPath();
 
     try (TempBlob tempBlob = repository.facet(StorageFacet.class).createTempBlob(contentPath,
-        ComposerContentFacetImpl.HASH_ALGORITHMS, configuration.isHardLinkingEnabled());
-        InputStream in = new BufferedInputStream(Files.newInputStream(contentPath, StandardOpenOption.READ))) {
-      ComposerContentFacet facet = repository.facet(ComposerContentFacet.class);
+        OrientOrientComposerContentFacetImpl.HASH_ALGORITHMS, configuration.isHardLinkingEnabled());
+         InputStream in = new BufferedInputStream(Files.newInputStream(contentPath, StandardOpenOption.READ))) {
+      OrientComposerContentFacet facet = repository.facet(OrientComposerContentFacet.class);
       facet.put(path,
           new TempBlobPayload(tempBlob, mimeSupport.detectMimeType(in, contentPath.getFileName().toString())));
       return facet.get(path);

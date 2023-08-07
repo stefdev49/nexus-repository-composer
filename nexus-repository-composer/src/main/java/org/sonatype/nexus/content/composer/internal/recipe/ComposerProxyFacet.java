@@ -22,25 +22,21 @@ import javax.inject.Named;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import org.sonatype.nexus.common.template.EscapeHelper;
 import org.sonatype.nexus.content.composer.ComposerContentFacet;
+import org.sonatype.nexus.orient.composer.internal.OrientComposerContentHandler;
 import org.sonatype.nexus.repository.cache.CacheController;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.content.facet.ContentProxyFacetSupport;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.*;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
-
-import com.google.common.collect.ImmutableSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.composer.internal.ComposerPathUtils.*;
 import static org.sonatype.nexus.repository.composer.internal.ComposerPathUtils.buildProviderPath;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.NAME_TOKEN;
 import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.PROJECT_TOKEN;
 import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.VENDOR_TOKEN;
 import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.VERSION_TOKEN;
@@ -241,7 +237,7 @@ public class ComposerProxyFacet
 
   private Payload getPackagePayload(final Context context, String path) throws Exception {
     Request request = new Request.Builder().action(GET).path(path)
-            .attribute(org.sonatype.nexus.orient.composer.internal.ComposerContentHandler.DO_NOT_REWRITE, "true").build();
+            .attribute(OrientComposerContentHandler.DO_NOT_REWRITE, "true").build();
     Response response = getRepository().facet(ViewFacet.class).dispatch(request, context);
     return response.getPayload();
   }

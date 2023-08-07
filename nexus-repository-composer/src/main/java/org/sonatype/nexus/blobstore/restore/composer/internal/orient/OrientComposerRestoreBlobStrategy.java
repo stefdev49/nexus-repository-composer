@@ -28,7 +28,7 @@ import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.log.DryRunPrefix;
 import org.sonatype.nexus.common.node.NodeAccess;
-import org.sonatype.nexus.orient.composer.ComposerContentFacet;
+import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.AssetBlob;
@@ -75,7 +75,7 @@ public class OrientComposerRestoreBlobStrategy
   protected boolean canAttemptRestore(final ComposerRestoreBlobData data) {
     Repository repository = data.getBlobData().getRepository();
 
-    if (!repository.optionalFacet(ComposerContentFacet.class).isPresent()) {
+    if (!repository.optionalFacet(OrientComposerContentFacet.class).isPresent()) {
       log.warn("Skipping as Composer Facet not found on repository: {}", repository.getName());
       return false;
     }
@@ -98,8 +98,8 @@ public class OrientComposerRestoreBlobStrategy
     getComposerContentFacet(data).put(getAssetPath(data), assetBlob, NO_CONTENT_ATTRIBUTES);
   }
 
-  private ComposerContentFacet getComposerContentFacet(final ComposerRestoreBlobData data) {
-    return data.getBlobData().getRepository().facet(ComposerContentFacet.class);
+  private OrientComposerContentFacet getComposerContentFacet(final ComposerRestoreBlobData data) {
+    return data.getBlobData().getRepository().facet(OrientComposerContentFacet.class);
   }
 
   @Override

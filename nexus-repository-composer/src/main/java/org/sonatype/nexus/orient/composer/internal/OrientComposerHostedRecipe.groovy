@@ -24,39 +24,47 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.attributes.AttributesFacet
-import org.sonatype.nexus.repository.group.GroupFacet
-import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.http.HttpMethods
+import org.sonatype.nexus.repository.http.PartialFetchHandler
 
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
+import org.sonatype.nexus.repository.composer.internal.ComposerIndexHtmlForwardHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
+import org.sonatype.nexus.repository.search.ElasticSearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
+import org.sonatype.nexus.repository.storage.SingleAssetComponentMaintenance
 import org.sonatype.nexus.repository.storage.StorageFacet
-import org.sonatype.nexus.repository.types.GroupType
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
+import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.handlers.HandlerContributor
+import org.sonatype.nexus.repository.view.handlers.LastDownloadedHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
+import org.sonatype.nexus.repository.view.matchers.ActionMatcher
+import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
+
 /**
- * Composer group repository recipe.
+ * Composer hosted repository recipe.
  *
  * @since 3.0
  */
-@Named(ComposerGroupRecipe.NAME)
+@Named(OrientComposerHostedRecipe.NAME)
 @Priority(Integer.MAX_VALUE)
 @Singleton
-class ComposerGroupRecipe
+class OrientComposerHostedRecipe
     extends RecipeSupport
 {
-  public static final String NAME = 'composer-group'
-
-  @Inject
-  Provider<StorageFacet> storageFacet
+  public static final String NAME = 'composer-hosted'
 
   @Inject
   Provider<ComposerSecurityFacet> securityFacet
@@ -65,10 +73,22 @@ class ComposerGroupRecipe
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
+  Provider<OrientOrientComposerContentFacetImpl> composerContentFacet
+
+  @Inject
+  Provider<StorageFacet> storageFacet
+
+  @Inject
   Provider<AttributesFacet> attributesFacet
 
   @Inject
-  Provider<GroupFacet> groupFacet
+  Provider<SingleAssetComponentMaintenance> componentMaintenance
+
+  @Inject
+  Provider<ElasticSearchFacet> searchFacet
+
+  @Inject
+  Provider<OrientComposerReplicationFacet> replicationFacet
 
   @Inject
   ExceptionHandler exceptionHandler
@@ -77,50 +97,84 @@ class ComposerGroupRecipe
   TimingHandler timingHandler
 
   @Inject
+  ComposerIndexHtmlForwardHandler indexHtmlForwardHandler
+
+  @Inject
   SecurityHandler securityHandler
 
   @Inject
-  GroupHandler groupHandler
+  PartialFetchHandler partialFetchHandler
+
+  @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
+  OrientComposerContentHandler composerContentHandler
+
+  @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
+
+  @Inject
+  LastDownloadedHandler lastDownloadedHandler
 
   @Inject
   HandlerContributor handlerContributor
 
   @Inject
-  ComposerGroupRecipe(@Named(GroupType.NAME) Type type,
-                 @Named(ComposerFormat.NAME) Format format)
+  OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
+                             @Named(ComposerFormat.NAME) final Format format)
   {
     super(type, format)
   }
 
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
-    repository.attach(storageFacet.get())
     repository.attach(securityFacet.get())
-    repository.attach(attributesFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(groupFacet.get())
+    repository.attach(contentFacet.get())
+    repository.attach(maintenanceFacet.get())
+    repository.attach(searchFacet.get())
+    repository.attach(browseFacet.get())
+    repository.attach(replicationFacet.get())
   }
 
   /**
    * Configure {@link ViewFacet}.
    */
-  private ViewFacet configure(final ConfigurableViewFacet viewFacet) {
+  private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
+    // Additional handlers, such as the lastDownloadHandler, are intentionally
+    // not included on this route because this route forwards to the route below.
+    // This route specifically handles GET / and forwards to /index.html.
     builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/{name:.*}'))
+        .matcher(and(new ActionMatcher(HttpMethods.GET), new SuffixMatcher('/')))
         .handler(timingHandler)
-        .handler(contentDispositionHandler)
+        .handler(indexHtmlForwardHandler)
+        .create()
+    )
+
+    builder.route(new Route.Builder()
+        .matcher(new TokenMatcher('/{name:.+}'))
+        .handler(timingHandler)
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
-        .handler(groupHandler)
+        .handler(conditionalRequestHandler)
+        .handler(partialFetchHandler)
+        .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
+        .handler(lastDownloadedHandler)
+        .handler(contentHandler)
         .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())
 
-    viewFacet.configure(builder.create())
+    facet.configure(builder.create())
 
-    return viewFacet
+    return facet
   }
 }

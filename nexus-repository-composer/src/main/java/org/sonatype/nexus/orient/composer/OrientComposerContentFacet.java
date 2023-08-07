@@ -16,21 +16,14 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
 import org.sonatype.nexus.common.collect.AttributesMap;
-import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
-import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
-
-import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 
 /**
  * Provides persistent storage for {@link Content}.
@@ -38,7 +31,7 @@ import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
  * @since 3.0
  */
 @Facet.Exposed
-public interface ComposerContentFacet
+public interface OrientComposerContentFacet
     extends Facet
 {
   @Nullable
