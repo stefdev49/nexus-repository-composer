@@ -17,7 +17,10 @@
 This repository originated in a fork of the [Sonatype Nexus Repository Composer Format](https://github.com/sonatype-nexus-community/nexus-repository-composer) plugin.
 But due to lack of features and its experimental status, it has been rebooted using the nexus-repository-raw and composer tidbits from the original repository.
 
-It is a work in progress, currently it supports:
+It is a work in progress, currently it supports only orientdb as storage backend.
+The following features are implemented:
 - proxy repositories
+- group repositories
 - rest api to configure composer repositories
 - support for upload package GUI
+- search composer packages
