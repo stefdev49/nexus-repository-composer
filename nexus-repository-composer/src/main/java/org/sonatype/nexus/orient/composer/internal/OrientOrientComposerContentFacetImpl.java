@@ -71,7 +71,8 @@ public class OrientOrientComposerContentFacetImpl
   private final AssetEntityAdapter assetEntityAdapter;
 
   @Inject
-  public OrientOrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter, final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
+  public OrientOrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter,
+                                              final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
   }
@@ -220,7 +221,7 @@ public class OrientOrientComposerContentFacetImpl
     return toContent(asset, assetBlob.getBlob());
   }
 
-  private static Result getResult(String path) {
+  protected static Result getResult(String path) {
     String[] parts = path.split("/");
     String vendor = parts[0];
     String project ;
@@ -232,15 +233,15 @@ public class OrientOrientComposerContentFacetImpl
     }
     String version;
     if (parts.length == 3) {
-      version = "latest";
+      version = parts[2];
     }
     else {
-      version = parts[2];
+      version = "latest";
     }
     return new Result(vendor, project, version);
   }
 
-  private static class Result {
+  protected static class Result {
     public final String vendor;
     public final String project;
     public final String version;
