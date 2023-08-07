@@ -12,6 +12,12 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
+import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
+import org.sonatype.nexus.repository.composer.internal.AssetKind
+import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackageJsonHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackagesJsonHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerGroupProviderJsonHandler
+
 import javax.annotation.Nonnull
 import javax.annotation.Priority
 import javax.inject.Inject
@@ -20,7 +26,6 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.Format
-import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.attributes.AttributesFacet
@@ -34,13 +39,11 @@ import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.types.GroupType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.handlers.HandlerContributor
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 /**
  * Composer group repository recipe.
@@ -51,9 +54,12 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 @Priority(Integer.MAX_VALUE)
 @Singleton
 class OrientComposerGroupRecipe
-    extends RecipeSupport
+    extends ComposerRecipeSupport
 {
   public static final String NAME = 'composer-group'
+
+  @Inject
+  Provider<GroupFacet> groupFacet
 
   @Inject
   Provider<StorageFacet> storageFacet
@@ -66,9 +72,6 @@ class OrientComposerGroupRecipe
 
   @Inject
   Provider<AttributesFacet> attributesFacet
-
-  @Inject
-  Provider<GroupFacet> groupFacet
 
   @Inject
   ExceptionHandler exceptionHandler
@@ -84,6 +87,15 @@ class OrientComposerGroupRecipe
 
   @Inject
   HandlerContributor handlerContributor
+
+  @Inject
+  ComposerGroupPackagesJsonHandler packagesJsonHandler
+
+  @Inject
+  ComposerGroupProviderJsonHandler providerJsonHandler
+
+  @Inject
+  ComposerGroupPackageJsonHandler packageJsonHandler
 
   @Inject
   OrientComposerGroupRecipe(@Named(GroupType.NAME) Type type,
@@ -107,15 +119,46 @@ class OrientComposerGroupRecipe
   private ViewFacet configure(final ConfigurableViewFacet viewFacet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/{name:.*}'))
+    builder.route(packagesMatcher()
         .handler(timingHandler)
-        .handler(contentDispositionHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(groupHandler)
+        .handler(packagesJsonHandler)
         .create())
+
+    builder.route(providerMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.PROVIDER))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(groupHandler)
+        .handler(providerJsonHandler)
+        .create())
+
+    builder.route(packageMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.PACKAGE))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(groupHandler)
+        .handler(packageJsonHandler)
+        .create())
+
+    builder.route(zipballMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.ZIPBALL))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(groupHandler)
+        .handler(packageJsonHandler)
+        .create())
+
 
     builder.defaultHandlers(HttpHandlers.badRequest())
 
