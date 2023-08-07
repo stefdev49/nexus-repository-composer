@@ -274,7 +274,7 @@ public class OrientOrientComposerContentFacetImpl
       asset.name(path);
     }
 
-    asset.markAsDownloaded();
+    asset.markAsDownloaded(AssetManager.DEFAULT_LAST_DOWNLOADED_INTERVAL);
 
     return asset;
   }
@@ -321,8 +321,9 @@ public class OrientOrientComposerContentFacetImpl
   @Override
   @Transactional
   public boolean assetExists(final String name) {
-    StorageTx tx = UnitOfWork.currentTx();
-    return assetEntityAdapter.exists(tx.getDb(), name, tx.findBucket(getRepository()));
+    try (StorageTx tx = UnitOfWork.currentTx()) {
+      return assetEntityAdapter.exists(tx.getDb(), name, tx.findBucket(getRepository()));
+    }
   }
 
   // findComponent function by path. split path into group, name, version
