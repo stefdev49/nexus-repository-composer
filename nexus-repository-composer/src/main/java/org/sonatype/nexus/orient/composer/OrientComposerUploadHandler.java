@@ -28,7 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.orient.composer.internal.OrientOrientComposerContentFacetImpl;
+import org.sonatype.nexus.orient.composer.internal.OrientComposerContentFacetImpl;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.importtask.ImportFileConfiguration;
 import org.sonatype.nexus.repository.composer.ComposerUploadHandlerSupport;
@@ -98,7 +98,7 @@ public class OrientComposerUploadHandler
     Path contentPath = configuration.getFile().toPath();
 
     try (TempBlob tempBlob = repository.facet(StorageFacet.class).createTempBlob(contentPath,
-        OrientOrientComposerContentFacetImpl.HASH_ALGORITHMS, configuration.isHardLinkingEnabled());
+        OrientComposerContentFacetImpl.HASH_ALGORITHMS, configuration.isHardLinkingEnabled());
          InputStream in = new BufferedInputStream(Files.newInputStream(contentPath, StandardOpenOption.READ))) {
       OrientComposerContentFacet facet = repository.facet(OrientComposerContentFacet.class);
       facet.put(path,

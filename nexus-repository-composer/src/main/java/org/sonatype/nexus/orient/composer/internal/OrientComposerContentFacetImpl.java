@@ -60,7 +60,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
  * @since 3.0
  */
 @Named
-public class OrientOrientComposerContentFacetImpl
+public class OrientComposerContentFacetImpl
     extends FacetSupport
     implements OrientComposerContentFacet
 {
@@ -71,8 +71,8 @@ public class OrientOrientComposerContentFacetImpl
   private final AssetEntityAdapter assetEntityAdapter;
 
   @Inject
-  public OrientOrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter,
-                                              final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
+  public OrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter,
+                                        final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
   }

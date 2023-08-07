@@ -2,14 +2,14 @@ package org.sonatype.nexus.orient.composer.internal;
 
 import junit.framework.TestCase;
 
-public class OrientOrientComposerContentFacetImplTest extends TestCase {
+public class OrientComposerContentFacetImplTest extends TestCase {
 
     public void testGetResultPackageJson() {
         // given
         String path = "packages.json";
 
         // when
-        OrientOrientComposerContentFacetImpl.Result result = OrientOrientComposerContentFacetImpl.getResult(path);
+        OrientComposerContentFacetImpl.Result result = OrientComposerContentFacetImpl.getResult(path);
 
         // then
         assertEquals("packages.json", result.vendor);
@@ -22,7 +22,7 @@ public class OrientOrientComposerContentFacetImplTest extends TestCase {
         String path = "packages/list.json";
 
         // when
-        OrientOrientComposerContentFacetImpl.Result result = OrientOrientComposerContentFacetImpl.getResult(path);
+        OrientComposerContentFacetImpl.Result result = OrientComposerContentFacetImpl.getResult(path);
 
         // then
         assertEquals("packages", result.vendor);
@@ -35,7 +35,7 @@ public class OrientOrientComposerContentFacetImplTest extends TestCase {
         String path = "vendor/project/1.2.3";
 
         // when
-        OrientOrientComposerContentFacetImpl.Result result = OrientOrientComposerContentFacetImpl.getResult(path);
+        OrientComposerContentFacetImpl.Result result = OrientComposerContentFacetImpl.getResult(path);
 
         // then
         assertEquals("vendor", result.vendor);

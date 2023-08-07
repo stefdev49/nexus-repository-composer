@@ -12,6 +12,12 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
+import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
+import org.sonatype.nexus.repository.composer.internal.AssetKind
+import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackageJsonHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackagesJsonHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerGroupProviderJsonHandler
+
 import javax.annotation.Nonnull
 import javax.annotation.Priority
 import javax.inject.Inject
@@ -20,12 +26,10 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.Format
-import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.http.HttpHandlers
-import org.sonatype.nexus.repository.http.HttpMethods
 import org.sonatype.nexus.repository.http.PartialFetchHandler
 
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
@@ -38,7 +42,6 @@ import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
@@ -47,11 +50,6 @@ import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.handlers.HandlerContributor
 import org.sonatype.nexus.repository.view.handlers.LastDownloadedHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
-import org.sonatype.nexus.repository.view.matchers.ActionMatcher
-import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
-
-import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
 
 /**
  * Composer hosted repository recipe.
@@ -62,7 +60,7 @@ import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.an
 @Priority(Integer.MAX_VALUE)
 @Singleton
 class OrientComposerHostedRecipe
-    extends RecipeSupport
+    extends ComposerRecipeSupport
 {
   public static final String NAME = 'composer-hosted'
 
@@ -73,7 +71,7 @@ class OrientComposerHostedRecipe
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
-  Provider<OrientOrientComposerContentFacetImpl> composerContentFacet
+  Provider<OrientComposerContentFacetImpl> composerContentFacet
 
   @Inject
   Provider<StorageFacet> storageFacet
@@ -124,6 +122,21 @@ class OrientComposerHostedRecipe
   HandlerContributor handlerContributor
 
   @Inject
+  ComposerGroupPackagesJsonHandler packagesJsonHandler
+
+  @Inject
+  ComposerGroupProviderJsonHandler providerJsonHandler
+
+  @Inject
+  ComposerGroupPackageJsonHandler packageJsonHandler
+
+  @Inject
+  Provider<OrientComposerHostedFacet> hostedFacet
+
+  @Inject
+  Provider<OrientComposerHostedMetadataFacet> hostedMetadataFacet
+
+  @Inject
   OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
                              @Named(ComposerFormat.NAME) final Format format)
   {
@@ -136,6 +149,8 @@ class OrientComposerHostedRecipe
     repository.attach(configure(viewFacet.get()))
     repository.attach(contentFacet.get())
     repository.attach(maintenanceFacet.get())
+    repository.attach(hostedFacet.get())
+    repository.attach(hostedMetadataFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(browseFacet.get())
     repository.attach(replicationFacet.get())
@@ -147,19 +162,9 @@ class OrientComposerHostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    // Additional handlers, such as the lastDownloadHandler, are intentionally
-    // not included on this route because this route forwards to the route below.
-    // This route specifically handles GET / and forwards to /index.html.
-    builder.route(new Route.Builder()
-        .matcher(and(new ActionMatcher(HttpMethods.GET), new SuffixMatcher('/')))
+    builder.route(packagesMatcher()
         .handler(timingHandler)
-        .handler(indexHtmlForwardHandler)
-        .create()
-    )
-
-    builder.route(new Route.Builder()
-        .matcher(new TokenMatcher('/{name:.+}'))
-        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
@@ -169,7 +174,52 @@ class OrientComposerHostedRecipe
         .handler(unitOfWorkHandler)
         .handler(lastDownloadedHandler)
         .handler(contentHandler)
+        .handler(packagesJsonHandler)
         .create())
+
+    builder.route(providerMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.PROVIDER))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(conditionalRequestHandler)
+        .handler(partialFetchHandler)
+        .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
+        .handler(lastDownloadedHandler)
+        .handler(contentHandler)
+        .handler(providerJsonHandler)
+        .create())
+
+    builder.route(packageMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.PACKAGE))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
+            .handler(lastDownloadedHandler)
+            .handler(contentHandler)
+            .handler(packageJsonHandler)
+            .create())
+
+    builder.route(packageMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.ZIPBALL))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
+            .handler(lastDownloadedHandler)
+            .handler(contentHandler)
+            .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())
 
