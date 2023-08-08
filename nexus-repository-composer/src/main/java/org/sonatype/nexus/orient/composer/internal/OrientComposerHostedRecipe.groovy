@@ -13,10 +13,12 @@
 package org.sonatype.nexus.orient.composer.internal
 
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
+import org.sonatype.nexus.orient.composer.OrientComposerContentFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackageJsonHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackagesJsonHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupProviderJsonHandler
+import org.sonatype.nexus.repository.content.browse.BrowseFacet
 
 import javax.annotation.Nonnull
 import javax.annotation.Priority
@@ -69,9 +71,6 @@ class OrientComposerHostedRecipe
 
   @Inject
   Provider<ConfigurableViewFacet> viewFacet
-
-  @Inject
-  Provider<OrientComposerContentFacetImpl> composerContentFacet
 
   @Inject
   Provider<StorageFacet> storageFacet
@@ -137,6 +136,12 @@ class OrientComposerHostedRecipe
   Provider<OrientComposerHostedMetadataFacet> hostedMetadataFacet
 
   @Inject
+  Provider<OrientComposerContentFacet> composerContentFacet
+
+  @Inject
+  Provider<BrowseFacet> browseFacet
+
+  @Inject
   OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
                              @Named(ComposerFormat.NAME) final Format format)
   {
@@ -147,12 +152,14 @@ class OrientComposerHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(contentFacet.get())
-    repository.attach(maintenanceFacet.get())
+    repository.attach(composerContentFacet.get())
+    repository.attach(componentMaintenance.get())
     repository.attach(hostedFacet.get())
     repository.attach(hostedMetadataFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(browseFacet.get())
+    repository.attach(storageFacet.get())
+    repository.attach(attributesFacet.get())
     repository.attach(replicationFacet.get())
   }
 
@@ -172,7 +179,6 @@ class OrientComposerHostedRecipe
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
-        .handler(lastDownloadedHandler)
         .handler(contentHandler)
         .handler(packagesJsonHandler)
         .create())
@@ -187,7 +193,6 @@ class OrientComposerHostedRecipe
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
-        .handler(lastDownloadedHandler)
         .handler(contentHandler)
         .handler(providerJsonHandler)
         .create())
@@ -202,12 +207,11 @@ class OrientComposerHostedRecipe
             .handler(partialFetchHandler)
             .handler(contentHeadersHandler)
             .handler(unitOfWorkHandler)
-            .handler(lastDownloadedHandler)
             .handler(contentHandler)
             .handler(packageJsonHandler)
             .create())
 
-    builder.route(packageMatcher()
+    builder.route(zipballMatcher()
             .handler(timingHandler)
             .handler(assetKindHandler.rcurry(AssetKind.ZIPBALL))
             .handler(securityHandler)

@@ -17,6 +17,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.content.composer.ComposerContentFacet;
 import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
@@ -65,7 +66,7 @@ public class OrientComposerHostedFacetImpl
 
   @Override
   public Content getZipball(final String path) throws IOException {
-    return content().get(path);
+    return content().get(path).get();
   }
 
   @Override
@@ -79,19 +80,19 @@ public class OrientComposerHostedFacetImpl
   @Override
   @TransactionalTouchMetadata
   public Content getProviderJson(final String vendor, final String project) throws IOException {
-    return content().get(ComposerPathUtils.buildProviderPath(vendor, project));
+    return content().get(ComposerPathUtils.buildProviderPath(vendor, project)).get();
   }
 
   @Override
   @TransactionalTouchMetadata
   public Content getPackageJson(final String vendor, final String project) throws IOException {
-    Content content = content().get(ComposerPathUtils.buildPackagePath(vendor, project));
+    Content content = content().get(ComposerPathUtils.buildPackagePath(vendor, project)).get();
     //Create v2 Package if it´s not existing
     if (content != null) {
       return content;
     } else {
       rebuildPackageJson(vendor, project);
-      return content().get(ComposerPathUtils.buildPackagePath(vendor, project));
+      return content().get(ComposerPathUtils.buildPackagePath(vendor, project)).get();
     }
   }
 
@@ -118,7 +119,7 @@ public class OrientComposerHostedFacetImpl
     return Query.builder().where(P_GROUP).eq(vendor).and(P_NAME).eq(project).build();
   }
 
-  private OrientComposerContentFacet content() {
-    return getRepository().facet(OrientComposerContentFacet.class);
+  private ComposerContentFacet content() {
+    return getRepository().facet(ComposerContentFacet.class);
   }
 }

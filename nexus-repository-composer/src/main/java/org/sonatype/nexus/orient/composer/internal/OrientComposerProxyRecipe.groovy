@@ -241,6 +241,7 @@ class OrientComposerProxyRecipe
             .handler(contentHeadersHandler)
             .handler(unitOfWorkHandler)
             .handler(proxyHandler)
+            .handler(lastDownloadedHandler)
             .create())
 
     builder.defaultHandlers(notFound())
