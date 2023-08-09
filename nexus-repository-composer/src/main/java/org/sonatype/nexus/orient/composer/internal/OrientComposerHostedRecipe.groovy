@@ -14,10 +14,12 @@ package org.sonatype.nexus.orient.composer.internal
 
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
+import org.sonatype.nexus.repository.storage.StorageFacet
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.Format
@@ -48,6 +50,9 @@ class OrientComposerHostedRecipe
   public static final String NAME = 'composer-hosted'
 
   @Inject
+  Provider<StorageFacet> storageFacet
+
+  @Inject
   OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
                              @Named(ComposerFormat.NAME) final Format format) {
     super(type, format)
@@ -57,6 +62,9 @@ class OrientComposerHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
+    repository.attach(storageFacet.get())
+    repository.attach(maintenanceFacet.get())
+    repository.attach(searchFacet.get())
     repository.attach(contentFacet.get())
   }
 
