@@ -56,7 +56,8 @@ import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
- * Composer proxy repository recipe.
+ * Composer proxy repository recipe.:wq
+ *
  *
  * @since 3.0
  */
@@ -64,15 +65,9 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 @Priority(Integer.MAX_VALUE)
 @Singleton
 class OrientComposerProxyRecipe
-    extends ComposerRecipeSupport
+    extends OrientComposerRecipeSupport
 {
   public static final String NAME = 'composer-proxy'
-
-  @Inject
-  Provider<ComposerSecurityFacet> securityFacet
-
-  @Inject
-  Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
   Provider<HttpClientFacet> httpClientFacet
@@ -84,55 +79,22 @@ class OrientComposerProxyRecipe
   Provider<OrientComposerProxyFacet> proxyFacet
 
   @Inject
-  Provider<OrientComposerContentFacet> composerContentFacet
-
-  @Inject
   Provider<StorageFacet> storageFacet
 
   @Inject
   Provider<AttributesFacet> attributesFacet
 
   @Inject
-  Provider<SingleAssetComponentMaintenance> componentMaintenance
-
-  @Inject
-  Provider<ElasticSearchFacet> searchFacet
-
-  @Inject
   Provider<PurgeUnusedFacet> purgeUnusedFacet
 
   @Inject
-  ExceptionHandler exceptionHandler
-
-  @Inject
-  TimingHandler timingHandler
-
-  @Inject
-  SecurityHandler securityHandler
-
-  @Inject
   NegativeCacheHandler negativeCacheHandler
-
-  @Inject
-  PartialFetchHandler partialFetchHandler
 
   @Inject
   UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
   ProxyHandler proxyHandler
-
-  @Inject
-  ConditionalRequestHandler conditionalRequestHandler
-
-  @Inject
-  ContentHeadersHandler contentHeadersHandler
-
-  @Inject
-  LastDownloadedHandler lastDownloadedHandler
-
-  @Inject
-  HandlerContributor handlerContributor
 
   @Inject
   RoutingRuleHandler routingRuleHandler
@@ -157,10 +119,10 @@ class OrientComposerProxyRecipe
     repository.attach(httpClientFacet.get())
     repository.attach(negativeCacheFacet.get())
     repository.attach(proxyFacet.get())
-    repository.attach(composerContentFacet.get())
+    repository.attach(contentFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(attributesFacet.get())
-    repository.attach(componentMaintenance.get())
+    repository.attach(maintenanceFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(purgeUnusedFacet.get())
   }

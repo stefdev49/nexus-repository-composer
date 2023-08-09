@@ -34,16 +34,11 @@ import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
 
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
-import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
-import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.types.GroupType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
-import org.sonatype.nexus.repository.view.handlers.HandlerContributor
-import org.sonatype.nexus.repository.view.handlers.TimingHandler
 
 /**
  * Composer group repository recipe.
@@ -54,7 +49,7 @@ import org.sonatype.nexus.repository.view.handlers.TimingHandler
 @Priority(Integer.MAX_VALUE)
 @Singleton
 class OrientComposerGroupRecipe
-    extends ComposerRecipeSupport
+    extends OrientComposerRecipeSupport
 {
   public static final String NAME = 'composer-group'
 
@@ -65,28 +60,10 @@ class OrientComposerGroupRecipe
   Provider<StorageFacet> storageFacet
 
   @Inject
-  Provider<ComposerSecurityFacet> securityFacet
-
-  @Inject
-  Provider<ConfigurableViewFacet> viewFacet
-
-  @Inject
   Provider<AttributesFacet> attributesFacet
 
   @Inject
-  ExceptionHandler exceptionHandler
-
-  @Inject
-  TimingHandler timingHandler
-
-  @Inject
-  SecurityHandler securityHandler
-
-  @Inject
   GroupHandler groupHandler
-
-  @Inject
-  HandlerContributor handlerContributor
 
   @Inject
   ComposerGroupPackagesJsonHandler packagesJsonHandler
