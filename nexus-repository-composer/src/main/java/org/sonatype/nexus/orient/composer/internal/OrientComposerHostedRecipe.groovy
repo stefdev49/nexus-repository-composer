@@ -32,21 +32,13 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.Format
-import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
-import org.sonatype.nexus.repository.http.HttpMethods
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.matchers.ActionMatcher
-import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
-
-import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
 
 /**
  * Composer hosted repository recipe.
