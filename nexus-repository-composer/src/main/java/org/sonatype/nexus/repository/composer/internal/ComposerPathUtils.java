@@ -7,10 +7,10 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.NAME_TOKEN;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.PROJECT_TOKEN;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.VENDOR_TOKEN;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.VERSION_TOKEN;
+import static org.sonatype.nexus.orient.composer.internal.OrientComposerRecipeSupport.NAME_TOKEN;
+import static org.sonatype.nexus.orient.composer.internal.OrientComposerRecipeSupport.PROJECT_TOKEN;
+import static org.sonatype.nexus.orient.composer.internal.OrientComposerRecipeSupport.VENDOR_TOKEN;
+import static org.sonatype.nexus.orient.composer.internal.OrientComposerRecipeSupport.VERSION_TOKEN;
 
 public class ComposerPathUtils {
     private static final String ZIPBALL_PATH = "%s/%s/%s/%s.zip";

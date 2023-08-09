@@ -46,7 +46,7 @@ import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 import static org.sonatype.nexus.repository.composer.external.ComposerAttributes.P_PROJECT;
 import static org.sonatype.nexus.repository.composer.external.ComposerAttributes.P_VENDOR;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.*;
+import static org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor.*;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_GROUP;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;

@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
-import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackageJsonHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackagesJsonHandler
@@ -28,13 +27,11 @@ import javax.inject.Singleton
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
 
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
-import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.types.GroupType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Router
@@ -55,12 +52,6 @@ class OrientComposerGroupRecipe
 
   @Inject
   Provider<GroupFacet> groupFacet
-
-  @Inject
-  Provider<StorageFacet> storageFacet
-
-  @Inject
-  Provider<AttributesFacet> attributesFacet
 
   @Inject
   GroupHandler groupHandler

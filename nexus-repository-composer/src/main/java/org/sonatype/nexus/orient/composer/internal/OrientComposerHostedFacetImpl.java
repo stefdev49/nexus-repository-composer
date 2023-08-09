@@ -17,12 +17,9 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.content.composer.ComposerContentFacet;
-import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
-import org.sonatype.nexus.repository.composer.internal.ComposerHostedFacet;
 import org.sonatype.nexus.repository.composer.internal.ComposerPathUtils;
 import org.sonatype.nexus.repository.storage.Query;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -45,7 +42,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
 @Named
 public class OrientComposerHostedFacetImpl
     extends FacetSupport
-    implements ComposerHostedFacet
+    implements OrientComposerHostedFacet
 {
   private final ComposerJsonProcessor composerJsonProcessor;
 
@@ -67,7 +64,7 @@ public class OrientComposerHostedFacetImpl
 
   @Override
   public Content getZipball(final String path) throws IOException {
-    return content().get(path).get();
+    return content().get(path);
   }
 
   @Override
@@ -81,19 +78,19 @@ public class OrientComposerHostedFacetImpl
   @Override
   @TransactionalTouchMetadata
   public Content getProviderJson(final String vendor, final String project) throws IOException {
-    return content().get(ComposerPathUtils.buildProviderPath(vendor, project)).get();
+    return content().get(ComposerPathUtils.buildProviderPath(vendor, project));
   }
 
   @Override
   @TransactionalTouchMetadata
   public Content getPackageJson(final String vendor, final String project) throws IOException {
-    Content content = content().get(ComposerPathUtils.buildPackagePath(vendor, project)).get();
+    Content content = content().get(ComposerPathUtils.buildPackagePath(vendor, project));
     //Create v2 Package if it´s not existing
     if (content != null) {
       return content;
     } else {
       rebuildPackageJson(vendor, project);
-      return content().get(ComposerPathUtils.buildPackagePath(vendor, project)).get();
+      return content().get(ComposerPathUtils.buildPackagePath(vendor, project));
     }
   }
 
@@ -120,7 +117,7 @@ public class OrientComposerHostedFacetImpl
     return Query.builder().where(P_GROUP).eq(vendor).and(P_NAME).eq(project).build();
   }
 
-  private ComposerContentFacet content() {
-    return getRepository().facet(ComposerContentFacet.class);
+  private OrientComposerContentFacet content() {
+    return getRepository().facet(OrientComposerContentFacet.class);
   }
 }

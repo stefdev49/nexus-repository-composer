@@ -12,21 +12,9 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
-import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
-import org.sonatype.nexus.orient.composer.OrientComposerContentFacet
-import org.sonatype.nexus.repository.composer.internal.AssetKind
-import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackageJsonHandler
-import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackagesJsonHandler
-import org.sonatype.nexus.repository.composer.internal.ComposerGroupProviderJsonHandler
-import org.sonatype.nexus.repository.composer.internal.ComposerHostedDownloadHandler
-import org.sonatype.nexus.repository.composer.internal.ComposerHostedFacet
-import org.sonatype.nexus.repository.composer.internal.ComposerHostedMetadataFacet
-import org.sonatype.nexus.repository.composer.internal.ComposerHostedUploadHandler
-import org.sonatype.nexus.repository.content.browse.BrowseFacet
 
-import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
+import org.sonatype.nexus.repository.composer.internal.AssetKind
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
-import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 
 import javax.annotation.Nonnull
@@ -58,22 +46,19 @@ class OrientComposerHostedRecipe
   public static final String NAME = 'composer-hosted'
 
   @Inject
-  Provider<StorageFacet> storageFacet
-
-  @Inject
   UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
-  Provider<ComposerHostedFacet> hostedFacet
+  Provider<OrientComposerHostedFacet> hostedFacet
 
   @Inject
-  Provider<ComposerHostedMetadataFacet> hostedMetadataFacet
+  Provider<OrientComposerHostedMetadataFacet> hostedMetadataFacet
 
   @Inject
-  ComposerHostedDownloadHandler downloadHandler
+  OrientComposerHostedDownloadHandler downloadHandler
 
   @Inject
-  ComposerHostedUploadHandler uploadHandler
+  OrientComposerHostedUploadHandler uploadHandler
 
   @Inject
   OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,

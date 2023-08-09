@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.composer.internal;
+package org.sonatype.nexus.orient.composer.internal;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,6 +18,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
@@ -33,14 +34,14 @@ import static org.sonatype.nexus.repository.composer.internal.ComposerPathUtils.
  */
 @Named
 @Singleton
-public class ComposerHostedDownloadHandler
+public class OrientComposerHostedDownloadHandler
     implements Handler
 {
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
     Repository repository = context.getRepository();
-    ComposerHostedFacet hostedFacet = repository.facet(ComposerHostedFacet.class);
+    OrientComposerHostedFacet hostedFacet = repository.facet(OrientComposerHostedFacet.class);
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
     switch (assetKind) {
       case PACKAGES:

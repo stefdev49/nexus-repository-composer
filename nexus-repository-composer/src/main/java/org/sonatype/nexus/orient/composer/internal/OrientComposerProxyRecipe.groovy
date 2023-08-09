@@ -13,8 +13,6 @@
 package org.sonatype.nexus.orient.composer.internal
 
 import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
-import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
-import org.sonatype.nexus.orient.composer.OrientComposerContentFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 
 import javax.annotation.Nonnull
@@ -27,36 +25,23 @@ import javax.inject.Singleton
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
-import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.cache.NegativeCacheFacet
 import org.sonatype.nexus.repository.cache.NegativeCacheHandler
-import org.sonatype.nexus.repository.http.PartialFetchHandler
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.purge.PurgeUnusedFacet
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
-import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
 import org.sonatype.nexus.repository.routing.RoutingRuleHandler
-import org.sonatype.nexus.repository.search.ElasticSearchFacet
-import org.sonatype.nexus.repository.security.SecurityHandler
-import org.sonatype.nexus.repository.storage.SingleAssetComponentMaintenance
-import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
-import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
-import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
-import org.sonatype.nexus.repository.view.handlers.HandlerContributor
-import org.sonatype.nexus.repository.view.handlers.LastDownloadedHandler
-import org.sonatype.nexus.repository.view.handlers.TimingHandler
 
 import static org.sonatype.nexus.repository.http.HttpHandlers.notFound
 
 /**
- * Composer proxy repository recipe.:wq
+ * Composer proxy repository recipe.
  *
  *
  * @since 3.0
@@ -77,12 +62,6 @@ class OrientComposerProxyRecipe
 
   @Inject
   Provider<OrientComposerProxyFacet> proxyFacet
-
-  @Inject
-  Provider<StorageFacet> storageFacet
-
-  @Inject
-  Provider<AttributesFacet> attributesFacet
 
   @Inject
   Provider<PurgeUnusedFacet> purgeUnusedFacet
@@ -115,16 +94,17 @@ class OrientComposerProxyRecipe
   @Override
   void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(securityFacet.get())
+    repository.attach(storageFacet.get())
+    repository.attach(contentFacet.get())
     repository.attach(configure(viewFacet.get()))
+    repository.attach(maintenanceFacet.get())
+    repository.attach(proxyFacet.get())
     repository.attach(httpClientFacet.get())
     repository.attach(negativeCacheFacet.get())
-    repository.attach(proxyFacet.get())
-    repository.attach(contentFacet.get())
-    repository.attach(storageFacet.get())
-    repository.attach(attributesFacet.get())
-    repository.attach(maintenanceFacet.get())
-    repository.attach(searchFacet.get())
     repository.attach(purgeUnusedFacet.get())
+    repository.attach(searchFacet.get())
+    repository.attach(browseFacet.get())
+    repository.attach(attributesFacet.get())
   }
 
   /**

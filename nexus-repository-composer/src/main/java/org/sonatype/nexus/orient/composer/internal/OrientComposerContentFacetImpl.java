@@ -22,12 +22,14 @@ import javax.inject.Named;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
+import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerFormatAttributesExtractor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.content.facet.ContentFacetSupport;
+import org.sonatype.nexus.repository.content.store.FormatStoreManager;
 import org.sonatype.nexus.repository.storage.*;
 import org.sonatype.nexus.repository.transaction.TransactionalDeleteBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
@@ -46,7 +48,7 @@ import com.google.common.collect.ImmutableList;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.*;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.*;
+import static org.sonatype.nexus.orient.composer.internal.OrientComposerRecipeSupport.*;
 import static org.sonatype.nexus.repository.composer.external.ComposerAttributes.P_PROJECT;
 import static org.sonatype.nexus.repository.composer.external.ComposerAttributes.P_VENDOR;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
@@ -61,7 +63,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
  */
 @Named
 public class OrientComposerContentFacetImpl
-    extends FacetSupport
+    extends ContentFacetSupport
     implements OrientComposerContentFacet
 {
   public static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(MD5, SHA1, SHA256);
@@ -72,7 +74,9 @@ public class OrientComposerContentFacetImpl
 
   @Inject
   public OrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter,
+                                        @Named("composer") FormatStoreManager formatStoreManager,
                                         final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
+    super(formatStoreManager);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
   }

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.composer.internal;
+package org.sonatype.nexus.orient.composer.internal;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -42,10 +42,10 @@ import static org.sonatype.nexus.repository.composer.internal.ComposerPathUtils.
  */
 @Named
 @Singleton
-public class ComposerHostedUploadHandler
+public class OrientComposerHostedUploadHandler
     implements Handler {
 
-  protected static final Logger log = Preconditions.checkNotNull(Loggers.getLogger(ComposerHostedUploadHandler.class));
+  protected static final Logger log = Preconditions.checkNotNull(Loggers.getLogger(OrientComposerHostedUploadHandler.class));
 
   @Nonnull
   @Override
@@ -94,7 +94,7 @@ public class ComposerHostedUploadHandler
       );
     }
 
-    ComposerHostedFacet hostedFacet = repository.facet(ComposerHostedFacet.class);
+    OrientComposerHostedFacet hostedFacet = repository.facet(OrientComposerHostedFacet.class);
 
     hostedFacet.upload(vendor, project, version, sourceType, sourceUrl, sourceRef, payload);
     return HttpResponses.ok();

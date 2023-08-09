@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.orient.composer;
+package org.sonatype.nexus.orient.composer.internal;
 
 import java.io.IOException;
 
@@ -18,8 +18,10 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
+import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.view.Content;
@@ -32,7 +34,7 @@ import org.sonatype.nexus.repository.view.Payload;
  */
 @Facet.Exposed
 public interface OrientComposerContentFacet
-    extends Facet
+    extends ContentFacet
 {
   @Nullable
   Content get(String path) throws IOException;

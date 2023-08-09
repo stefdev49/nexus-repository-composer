@@ -28,7 +28,7 @@ import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.log.DryRunPrefix;
 import org.sonatype.nexus.common.node.NodeAccess;
-import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
+import org.sonatype.nexus.orient.composer.internal.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.AssetBlob;

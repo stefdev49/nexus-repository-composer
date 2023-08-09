@@ -21,7 +21,6 @@ import javax.inject.Named;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
@@ -30,7 +29,7 @@ import org.sonatype.nexus.repository.view.*;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport.*;
+import static org.sonatype.nexus.orient.composer.internal.OrientComposerRecipeSupport.*;
 import static org.sonatype.nexus.repository.composer.internal.ComposerPathUtils.*;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
 

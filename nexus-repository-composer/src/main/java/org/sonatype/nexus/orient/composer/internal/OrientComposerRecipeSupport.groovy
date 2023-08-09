@@ -14,7 +14,6 @@ package org.sonatype.nexus.orient.composer.internal
 
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerContentHandler
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerReplicationFacet
-import org.sonatype.nexus.orient.composer.OrientComposerContentFacet
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Type
@@ -27,6 +26,7 @@ import org.sonatype.nexus.repository.content.maintenance.SingleAssetMaintenanceF
 import org.sonatype.nexus.repository.content.search.SearchFacet
 import org.sonatype.nexus.repository.http.PartialFetchHandler
 import org.sonatype.nexus.repository.security.SecurityHandler
+import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
 import org.sonatype.nexus.repository.view.Route
@@ -85,6 +85,9 @@ abstract class OrientComposerRecipeSupport
   Provider<BrowseFacet> browseFacet
 
   @Inject
+  Provider<StorageFacet> storageFacet
+
+  @Inject
   Provider<ComposerReplicationFacet> replicationFacet
 
   @Inject
@@ -117,6 +120,7 @@ abstract class OrientComposerRecipeSupport
   @Inject
   HandlerContributor handlerContributor
 
+  @Inject
   protected OrientComposerRecipeSupport(final Type type, final Format format)
   {
     super(type, format)
