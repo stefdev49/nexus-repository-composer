@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.orient.composer.internal;
+package org.sonatype.nexus.repository.composer.internal;
 
 import java.io.IOException;
 
@@ -24,7 +24,7 @@ import org.sonatype.nexus.repository.view.Payload;
  * Interface defining the features supported by Composer repository hosted facets.
  */
 @Facet.Exposed
-public interface OrientComposerHostedFacet
+public interface ComposerHostedFacet
     extends Facet
 {
   void upload(String vendor, String project, String version, String sourceType, String sourceUrl,

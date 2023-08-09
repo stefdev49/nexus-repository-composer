@@ -18,6 +18,7 @@ import org.sonatype.nexus.orient.composer.OrientComposerContentFacet
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Type
+import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 import org.sonatype.nexus.repository.composer.internal.ComposerIndexHtmlForwardHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
@@ -76,6 +77,9 @@ abstract class OrientComposerRecipeSupport
 
   @Inject
   Provider<SearchFacet> searchFacet
+
+  @Inject
+  Provider<AttributesFacet> attributesFacet
 
   @Inject
   Provider<BrowseFacet> browseFacet

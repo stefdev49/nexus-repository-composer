@@ -18,11 +18,16 @@ import org.sonatype.nexus.repository.composer.internal.AssetKind
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackageJsonHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupPackagesJsonHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerGroupProviderJsonHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerHostedDownloadHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerHostedFacet
+import org.sonatype.nexus.repository.composer.internal.ComposerHostedMetadataFacet
+import org.sonatype.nexus.repository.composer.internal.ComposerHostedUploadHandler
 import org.sonatype.nexus.repository.content.browse.BrowseFacet
 
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerRecipeSupport
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
 import org.sonatype.nexus.repository.storage.StorageFacet
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 
 import javax.annotation.Nonnull
 import javax.annotation.Priority
@@ -56,6 +61,21 @@ class OrientComposerHostedRecipe
   Provider<StorageFacet> storageFacet
 
   @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
+  Provider<ComposerHostedFacet> hostedFacet
+
+  @Inject
+  Provider<ComposerHostedMetadataFacet> hostedMetadataFacet
+
+  @Inject
+  ComposerHostedDownloadHandler downloadHandler
+
+  @Inject
+  ComposerHostedUploadHandler uploadHandler
+
+  @Inject
   OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
                              @Named(ComposerFormat.NAME) final Format format) {
     super(type, format)
@@ -64,12 +84,16 @@ class OrientComposerHostedRecipe
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
-    repository.attach(configure(viewFacet.get()))
     repository.attach(storageFacet.get())
+    repository.attach(contentFacet.get())
+    repository.attach(configure(viewFacet.get()))
     repository.attach(maintenanceFacet.get())
+    repository.attach(hostedFacet.get())
+    repository.attach(hostedMetadataFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(browseFacet.get())
     repository.attach(replicationFacet.get())
+    repository.attach(attributesFacet.get())
   }
 
   /**
@@ -79,32 +103,30 @@ class OrientComposerHostedRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(packagesMatcher()
-        .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
-        .handler(securityHandler)
-        .handler(exceptionHandler)
-        .handler(handlerContributor)
-        .handler(conditionalRequestHandler)
-        .handler(partialFetchHandler)
-        .handler(contentHeadersHandler)
-        .handler(unitOfWorkHandler)
-        .handler(contentHandler)
-        .handler(packagesJsonHandler)
-        .create())
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
+            .handler(downloadHandler)
+            .create())
 
     builder.route(providerMatcher()
-        .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(AssetKind.PROVIDER))
-        .handler(securityHandler)
-        .handler(exceptionHandler)
-        .handler(handlerContributor)
-        .handler(conditionalRequestHandler)
-        .handler(partialFetchHandler)
-        .handler(contentHeadersHandler)
-        .handler(unitOfWorkHandler)
-        .handler(contentHandler)
-        .handler(providerJsonHandler)
-        .create())
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.PROVIDER))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
+            .handler(downloadHandler)
+            .create())
 
     builder.route(packageMatcher()
             .handler(timingHandler)
@@ -116,8 +138,7 @@ class OrientComposerHostedRecipe
             .handler(partialFetchHandler)
             .handler(contentHeadersHandler)
             .handler(unitOfWorkHandler)
-            .handler(contentHandler)
-            .handler(packageJsonHandler)
+            .handler(downloadHandler)
             .create())
 
     builder.route(zipballMatcher()
@@ -130,8 +151,20 @@ class OrientComposerHostedRecipe
             .handler(partialFetchHandler)
             .handler(contentHeadersHandler)
             .handler(unitOfWorkHandler)
-            .handler(lastDownloadedHandler)
-            .handler(contentHandler)
+            .handler(downloadHandler)
+            .create())
+
+    builder.route(uploadMatcher()
+            .handler(timingHandler)
+            .handler(assetKindHandler.rcurry(AssetKind.ZIPBALL))
+            .handler(securityHandler)
+            .handler(exceptionHandler)
+            .handler(handlerContributor)
+            .handler(conditionalRequestHandler)
+            .handler(partialFetchHandler)
+            .handler(contentHeadersHandler)
+            .handler(unitOfWorkHandler)
+            .handler(uploadHandler)
             .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())

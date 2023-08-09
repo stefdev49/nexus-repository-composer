@@ -21,6 +21,8 @@ import org.sonatype.nexus.common.event.EventManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
+import org.sonatype.nexus.repository.composer.internal.ComposerHostedFacet;
+import org.sonatype.nexus.repository.composer.internal.ComposerHostedMetadataFacet;
 import org.sonatype.nexus.repository.composer.internal.ComposerHostedMetadataInvalidationEvent;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
@@ -42,13 +44,13 @@ import static org.sonatype.nexus.repository.composer.external.ComposerAttributes
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
- * Concrete implementation of {@code OrientComposerHostedMetadataFacet} using events. Essentially a stripped-down form of the
+ * Concrete implementation of {@code ComposerHostedMetadataFacet} using events. Essentially a stripped-down form of the
  * mechanism behind the Yum createrepo implementation in our internal codebase.
  */
 @Named
 public class OrientComposerHostedMetadataFacetImpl
     extends FacetSupport
-    implements OrientComposerHostedMetadataFacet
+    implements ComposerHostedMetadataFacet
 {
   private final EventManager eventManager;
 
@@ -89,7 +91,7 @@ public class OrientComposerHostedMetadataFacetImpl
   @Guarded(by = STARTED)
   public void on(final ComposerHostedMetadataInvalidationEvent event) throws IOException {
     if (getRepository().getName().equals(event.getRepositoryName())) {
-      OrientComposerHostedFacet hostedFacet = getRepository().facet(OrientComposerHostedFacet.class);
+      ComposerHostedFacet hostedFacet = getRepository().facet(ComposerHostedFacet.class);
       UnitOfWork.begin(getRepository().facet(StorageFacet.class).txSupplier());
       try {
         hostedFacet.rebuildProviderJson(event.getVendor(), event.getProject());

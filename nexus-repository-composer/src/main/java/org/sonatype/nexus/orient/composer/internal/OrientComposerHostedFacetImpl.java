@@ -22,6 +22,7 @@ import org.sonatype.nexus.orient.composer.OrientComposerContentFacet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
+import org.sonatype.nexus.repository.composer.internal.ComposerHostedFacet;
 import org.sonatype.nexus.repository.composer.internal.ComposerPathUtils;
 import org.sonatype.nexus.repository.storage.Query;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -44,7 +45,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
 @Named
 public class OrientComposerHostedFacetImpl
     extends FacetSupport
-    implements OrientComposerHostedFacet
+    implements ComposerHostedFacet
 {
   private final ComposerJsonProcessor composerJsonProcessor;
 
