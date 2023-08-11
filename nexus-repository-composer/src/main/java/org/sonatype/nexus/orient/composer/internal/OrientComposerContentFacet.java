@@ -34,7 +34,7 @@ import org.sonatype.nexus.repository.view.Payload;
  */
 @Facet.Exposed
 public interface OrientComposerContentFacet
-    extends ContentFacet
+    extends Facet
 {
   @Nullable
   Content get(String path) throws IOException;

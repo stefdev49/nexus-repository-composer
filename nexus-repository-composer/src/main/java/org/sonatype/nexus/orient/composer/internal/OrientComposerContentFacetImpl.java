@@ -64,7 +64,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
  */
 @Named(ComposerFormat.NAME)
 public class OrientComposerContentFacetImpl
-    extends ContentFacetSupport
+    extends FacetSupport
     implements OrientComposerContentFacet
 {
   public static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(MD5, SHA1, SHA256);
@@ -75,9 +75,7 @@ public class OrientComposerContentFacetImpl
 
   @Inject
   public OrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter,
-                                        @Named(ComposerFormat.NAME) FormatStoreManager formatStoreManager,
                                         final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
-    super(formatStoreManager);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
   }
