@@ -22,15 +22,12 @@ import javax.inject.Named;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerFormatAttributesExtractor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.content.facet.ContentFacetSupport;
-import org.sonatype.nexus.repository.content.store.FormatStoreManager;
 import org.sonatype.nexus.repository.storage.*;
 import org.sonatype.nexus.repository.transaction.TransactionalDeleteBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
@@ -105,7 +102,6 @@ public class OrientComposerContentFacetImpl
 
   @Override
   public Content put(final String path, final Payload content) throws IOException {
-
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(content, HASH_ALGORITHMS)) {
       return doPutContent(path, tempBlob, content, AssetKind.ZIPBALL, null, null, null);
@@ -141,6 +137,7 @@ public class OrientComposerContentFacetImpl
           throws IOException
   {
     StorageTx tx = UnitOfWork.currentTx();
+    log.info("XXX STEF XXX Putting metadata at {}", path);
     Result result = getResult(path);
     Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
     asset.formatAttributes().set(P_ASSET_KIND, assetKind.toString());
@@ -167,6 +164,7 @@ public class OrientComposerContentFacetImpl
   @TransactionalStoreBlob
   public Asset put(final String path, final AssetBlob assetBlob, @Nullable final AttributesMap contentAttributes) {
     StorageTx tx = UnitOfWork.currentTx();
+    log.info("XXX STEF XXX Putting asset at {}", path);
     Result result = getResult(path);
     Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
     tx.attachBlob(asset, assetBlob);
@@ -185,6 +183,7 @@ public class OrientComposerContentFacetImpl
                                  final String sourceReference)
       throws IOException
   {
+    log.info("XXX STEF XXX Putting content at {}", path);
     Result result = getResult(path);
 
     StorageTx tx = UnitOfWork.currentTx();
@@ -331,6 +330,7 @@ public class OrientComposerContentFacetImpl
 
   // findComponent function by path. split path into group, name, version
   private Component findComponent(final StorageTx tx, final String path) {
+    log.info("XXX STEF XXX Finding component for path {}", path);
     Result result = getResult(path);
     return findComponent(tx, result.vendor, result.project, result.version);
   }
@@ -349,7 +349,7 @@ public class OrientComposerContentFacetImpl
   }
 
   private Asset findAsset(final StorageTx tx, final String path) {
-    log.debug("Finding asset for path {}", path);
+    log.info("XXX STEF XXX Finding asset for path {}", path);
     return tx.findAssetWithProperty(P_NAME, path, tx.findBucket(getRepository()));
   }
 
