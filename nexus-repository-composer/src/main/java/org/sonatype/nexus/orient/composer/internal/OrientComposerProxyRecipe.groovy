@@ -95,17 +95,12 @@ class OrientComposerProxyRecipe
 
   @Override
   void apply(final @Nonnull Repository repository) throws Exception {
-    repository.attach(securityFacet.get())
+    super.apply(repository)
     repository.attach(configure(viewFacet.get()))
-    repository.attach(composerContentFacet.get())
-    repository.attach(storageFacet.get())
-    repository.attach(attributesFacet.get())
-    repository.attach(maintenanceFacet.get())
     repository.attach(proxyFacet.get())
     repository.attach(httpClientFacet.get())
     repository.attach(negativeCacheFacet.get())
     repository.attach(purgeUnusedFacet.get())
-    repository.attach(searchFacet.get())
   }
 
   /**

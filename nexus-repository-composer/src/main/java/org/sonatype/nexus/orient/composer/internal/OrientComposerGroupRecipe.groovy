@@ -74,9 +74,7 @@ class OrientComposerGroupRecipe
 
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
-    repository.attach(storageFacet.get())
-    repository.attach(securityFacet.get())
-    repository.attach(attributesFacet.get())
+    super.apply(repository)
     repository.attach(configure(viewFacet.get()))
     repository.attach(groupFacet.get())
   }

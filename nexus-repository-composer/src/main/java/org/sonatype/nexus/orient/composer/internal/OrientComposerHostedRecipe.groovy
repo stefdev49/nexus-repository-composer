@@ -75,29 +75,11 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT
 @Priority(Integer.MAX_VALUE)
 @Singleton
 class OrientComposerHostedRecipe
-    extends RecipeSupport {
+    extends OrientComposerRecipeSupport {
   public static final String NAME = 'composer-hosted'
 
   @Inject
-  Provider<ComposerSecurityFacet> securityFacet
-
-  @Inject
-  Provider<ConfigurableViewFacet> viewFacet
-
-  @Inject
-  Provider<ElasticSearchFacet> searchFacet
-
-  @Inject
-  Provider<StorageFacet> storageFacet
-
-  @Inject
-  Provider<AttributesFacet> attributesFacet
-
-  @Inject
   Provider<SingleAssetComponentMaintenance> componentMaintenance
-
-  @Inject
-  Provider<OrientComposerContentFacetImpl> composerContentFacet
 
   @Inject
   UnitOfWorkHandler unitOfWorkHandler
@@ -115,36 +97,6 @@ class OrientComposerHostedRecipe
   OrientComposerHostedUploadHandler uploadHandler
 
   @Inject
-  ExceptionHandler exceptionHandler
-
-  @Inject
-  TimingHandler timingHandler
-
-  @Inject
-  ComposerIndexHtmlForwardHandler indexHtmlForwardHandler
-
-  @Inject
-  SecurityHandler securityHandler
-
-  @Inject
-  PartialFetchHandler partialFetchHandler
-
-  @Inject
-  ComposerContentHandler contentHandler
-
-  @Inject
-  ConditionalRequestHandler conditionalRequestHandler
-
-  @Inject
-  ContentHeadersHandler contentHeadersHandler
-
-  @Inject
-  LastDownloadedHandler lastDownloadedHandler
-
-  @Inject
-  HandlerContributor handlerContributor
-
-  @Inject
   OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
                              @Named(ComposerFormat.NAME) final Format format) {
     super(type, format)
@@ -152,15 +104,11 @@ class OrientComposerHostedRecipe
 
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
-    repository.attach(securityFacet.get())
+    super.apply(repository)
     repository.attach(configure(viewFacet.get()))
-    repository.attach(composerContentFacet.get())
-    repository.attach(storageFacet.get())
-    repository.attach(attributesFacet.get())
     repository.attach(componentMaintenance.get())
     repository.attach(hostedFacet.get())
     repository.attach(hostedMetadataFacet.get())
-    repository.attach(searchFacet.get())
   }
 
   /**
@@ -239,58 +187,5 @@ class OrientComposerHostedRecipe
     facet.configure(builder.create())
 
     return facet
-  }
-
-  Closure assetKindHandler = { Context context, AssetKind value ->
-    context.attributes.set(AssetKind, value)
-    return context.proceed()
-  }
-
-  static Route.Builder packagesMatcher() {
-    new Route.Builder().matcher(
-            LogicMatchers.and(
-                    new ActionMatcher(GET, HEAD),
-                    new LiteralMatcher('/packages.json')
-            ))
-  }
-
-  static Route.Builder listMatcher() {
-    new Route.Builder().matcher(
-            LogicMatchers.and(
-                    new ActionMatcher(GET, HEAD),
-                    new LiteralMatcher('/packages/list.json')
-            ))
-  }
-
-  static Route.Builder providerMatcher() {
-    new Route.Builder().matcher(
-            LogicMatchers.and(
-                    new ActionMatcher(GET, HEAD),
-                    new TokenMatcher('/p/{vendor:.+}/{project:.+}.json')
-            ))
-  }
-
-  static Route.Builder packageMatcher() {
-    new Route.Builder().matcher(
-            LogicMatchers.and(
-                    new ActionMatcher(GET, HEAD),
-                    new TokenMatcher('/p2/{vendor:.+}/{project:.+}.json')
-            ))
-  }
-
-  static Route.Builder zipballMatcher() {
-    new Route.Builder().matcher(
-            LogicMatchers.and(
-                    new ActionMatcher(GET, HEAD),
-                    new TokenMatcher('/{vendor:.+}/{project:.+}/{version:.+}/{name:.+}.zip')
-            ))
-  }
-
-  static Route.Builder uploadMatcher() {
-    new Route.Builder().matcher(
-            LogicMatchers.and(
-                    new ActionMatcher(PUT),
-                    new TokenMatcher('/packages/upload/{vendor:.+}/{project:.+}/{version:.+}')
-            ))
   }
 }

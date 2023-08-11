@@ -16,6 +16,7 @@ import org.sonatype.nexus.content.composer.internal.recipe.ComposerContentHandle
 import org.sonatype.nexus.content.composer.internal.recipe.ComposerReplicationFacet
 import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
+import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
@@ -36,6 +37,7 @@ import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
 import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
+import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -121,6 +123,14 @@ abstract class OrientComposerRecipeSupport
   protected OrientComposerRecipeSupport(final Type type, final Format format)
   {
     super(type, format)
+  }
+
+  void apply(@Nonnull final Repository repository) throws Exception {
+    repository.attach(securityFacet.get())
+    repository.attach(composerContentFacet.get())
+    repository.attach(storageFacet.get())
+    repository.attach(attributesFacet.get())
+    repository.attach(searchFacet.get())
   }
 
   Closure assetKindHandler = { Context context, AssetKind value ->
