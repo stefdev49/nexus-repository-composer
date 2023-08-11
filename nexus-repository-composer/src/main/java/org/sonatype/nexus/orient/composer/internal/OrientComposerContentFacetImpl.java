@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerFormatAttributesExtractor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
+import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.content.facet.ContentFacetSupport;
 import org.sonatype.nexus.repository.content.store.FormatStoreManager;
@@ -61,7 +62,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
  *
  * @since 3.0
  */
-@Named
+@Named(ComposerFormat.NAME)
 public class OrientComposerContentFacetImpl
     extends ContentFacetSupport
     implements OrientComposerContentFacet
@@ -74,7 +75,7 @@ public class OrientComposerContentFacetImpl
 
   @Inject
   public OrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter,
-                                        @Named("composer") FormatStoreManager formatStoreManager,
+                                        @Named(ComposerFormat.NAME) FormatStoreManager formatStoreManager,
                                         final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
     super(formatStoreManager);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
