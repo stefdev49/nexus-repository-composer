@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.orient.composer.internal;
+package org.sonatype.nexus.repository.composer.internal;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Named
 @Singleton
-public class OrientComposerContentHandler
+public class ComposerContentHandler
     extends ComponentSupport
     implements Handler
 {
@@ -44,7 +44,7 @@ public class OrientComposerContentHandler
   private final ComposerJsonProcessor composerJsonProcessor;
 
   @Inject
-  public OrientComposerContentHandler(final ComposerJsonProcessor composerJsonProcessor) {
+  public ComposerContentHandler(final ComposerJsonProcessor composerJsonProcessor) {
     this.composerJsonProcessor = checkNotNull(composerJsonProcessor);
   }
 

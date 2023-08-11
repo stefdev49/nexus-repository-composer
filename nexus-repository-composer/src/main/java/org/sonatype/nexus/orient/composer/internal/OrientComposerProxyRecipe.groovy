@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
-import org.sonatype.nexus.content.composer.internal.ComposerProviderHandler
+
 import org.sonatype.nexus.repository.composer.internal.AssetKind
+import org.sonatype.nexus.repository.composer.internal.ComposerContentHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerProviderHandler
 
 import javax.annotation.Nonnull
 import javax.annotation.Priority
@@ -79,7 +81,7 @@ class OrientComposerProxyRecipe
   RoutingRuleHandler routingRuleHandler
 
   @Inject
-  OrientComposerContentHandler composerContentHandler
+  ComposerContentHandler composerContentHandler
 
   @Inject
   ComposerProviderHandler composerProviderHandler
