@@ -64,7 +64,7 @@ abstract class OrientComposerRecipeSupport
   public static final String SOURCE_REFERENCE_FIELD_NAME = 'src-ref';
 
   @Inject
-  Provider<OrientComposerContentFacet> contentFacet
+  Provider<OrientComposerContentFacetImpl> composerContentFacet
 
   @Inject
   Provider<ComposerSecurityFacet> securityFacet
