@@ -12,10 +12,31 @@
  */
 package org.sonatype.nexus.orient.composer.internal
 
-
+import org.sonatype.nexus.content.composer.internal.recipe.ComposerContentHandler
+import org.sonatype.nexus.repository.RecipeSupport
+import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat
+import org.sonatype.nexus.repository.composer.internal.ComposerIndexHtmlForwardHandler
+import org.sonatype.nexus.repository.composer.internal.ComposerSecurityFacet
+import org.sonatype.nexus.repository.http.PartialFetchHandler
+import org.sonatype.nexus.repository.search.ElasticSearchFacet
+import org.sonatype.nexus.repository.security.SecurityHandler
+import org.sonatype.nexus.repository.storage.SingleAssetComponentMaintenance
+import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
+import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Route
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
+import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.HandlerContributor
+import org.sonatype.nexus.repository.view.handlers.LastDownloadedHandler
+import org.sonatype.nexus.repository.view.handlers.TimingHandler
+import org.sonatype.nexus.repository.view.matchers.ActionMatcher
+import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
+import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
+import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 import javax.annotation.Nonnull
 import javax.annotation.Priority
@@ -33,6 +54,18 @@ import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 
+import static org.sonatype.nexus.repository.http.HttpMethods.GET
+import static org.sonatype.nexus.repository.http.HttpMethods.GET
+import static org.sonatype.nexus.repository.http.HttpMethods.GET
+import static org.sonatype.nexus.repository.http.HttpMethods.GET
+import static org.sonatype.nexus.repository.http.HttpMethods.GET
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
+import static org.sonatype.nexus.repository.http.HttpMethods.PUT
+
 /**
  * Composer hosted repository recipe.
  *
@@ -42,8 +75,29 @@ import org.sonatype.nexus.repository.view.ViewFacet
 @Priority(Integer.MAX_VALUE)
 @Singleton
 class OrientComposerHostedRecipe
-    extends OrientComposerRecipeSupport {
+    extends RecipeSupport {
   public static final String NAME = 'composer-hosted'
+
+  @Inject
+  Provider<ComposerSecurityFacet> securityFacet
+
+  @Inject
+  Provider<ConfigurableViewFacet> viewFacet
+
+  @Inject
+  Provider<ElasticSearchFacet> searchFacet
+
+  @Inject
+  Provider<StorageFacet> storageFacet
+
+  @Inject
+  Provider<AttributesFacet> attributesFacet
+
+  @Inject
+  Provider<SingleAssetComponentMaintenance> componentMaintenance
+
+  @Inject
+  Provider<OrientComposerContentFacetImpl> composerContentFacet
 
   @Inject
   UnitOfWorkHandler unitOfWorkHandler
@@ -61,6 +115,36 @@ class OrientComposerHostedRecipe
   OrientComposerHostedUploadHandler uploadHandler
 
   @Inject
+  ExceptionHandler exceptionHandler
+
+  @Inject
+  TimingHandler timingHandler
+
+  @Inject
+  ComposerIndexHtmlForwardHandler indexHtmlForwardHandler
+
+  @Inject
+  SecurityHandler securityHandler
+
+  @Inject
+  PartialFetchHandler partialFetchHandler
+
+  @Inject
+  ComposerContentHandler contentHandler
+
+  @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
+
+  @Inject
+  LastDownloadedHandler lastDownloadedHandler
+
+  @Inject
+  HandlerContributor handlerContributor
+
+  @Inject
   OrientComposerHostedRecipe(@Named(HostedType.NAME) final Type type,
                              @Named(ComposerFormat.NAME) final Format format) {
     super(type, format)
@@ -69,16 +153,14 @@ class OrientComposerHostedRecipe
   @Override
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
-    repository.attach(storageFacet.get())
-    repository.attach(contentFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(maintenanceFacet.get())
+    repository.attach(composerContentFacet.get())
+    repository.attach(storageFacet.get())
+    repository.attach(attributesFacet.get())
+    repository.attach(componentMaintenance.get())
     repository.attach(hostedFacet.get())
     repository.attach(hostedMetadataFacet.get())
     repository.attach(searchFacet.get())
-    repository.attach(browseFacet.get())
-    repository.attach(replicationFacet.get())
-    repository.attach(attributesFacet.get())
   }
 
   /**
@@ -157,5 +239,58 @@ class OrientComposerHostedRecipe
     facet.configure(builder.create())
 
     return facet
+  }
+
+  Closure assetKindHandler = { Context context, AssetKind value ->
+    context.attributes.set(AssetKind, value)
+    return context.proceed()
+  }
+
+  static Route.Builder packagesMatcher() {
+    new Route.Builder().matcher(
+            LogicMatchers.and(
+                    new ActionMatcher(GET, HEAD),
+                    new LiteralMatcher('/packages.json')
+            ))
+  }
+
+  static Route.Builder listMatcher() {
+    new Route.Builder().matcher(
+            LogicMatchers.and(
+                    new ActionMatcher(GET, HEAD),
+                    new LiteralMatcher('/packages/list.json')
+            ))
+  }
+
+  static Route.Builder providerMatcher() {
+    new Route.Builder().matcher(
+            LogicMatchers.and(
+                    new ActionMatcher(GET, HEAD),
+                    new TokenMatcher('/p/{vendor:.+}/{project:.+}.json')
+            ))
+  }
+
+  static Route.Builder packageMatcher() {
+    new Route.Builder().matcher(
+            LogicMatchers.and(
+                    new ActionMatcher(GET, HEAD),
+                    new TokenMatcher('/p2/{vendor:.+}/{project:.+}.json')
+            ))
+  }
+
+  static Route.Builder zipballMatcher() {
+    new Route.Builder().matcher(
+            LogicMatchers.and(
+                    new ActionMatcher(GET, HEAD),
+                    new TokenMatcher('/{vendor:.+}/{project:.+}/{version:.+}/{name:.+}.zip')
+            ))
+  }
+
+  static Route.Builder uploadMatcher() {
+    new Route.Builder().matcher(
+            LogicMatchers.and(
+                    new ActionMatcher(PUT),
+                    new TokenMatcher('/packages/upload/{vendor:.+}/{project:.+}/{version:.+}')
+            ))
   }
 }

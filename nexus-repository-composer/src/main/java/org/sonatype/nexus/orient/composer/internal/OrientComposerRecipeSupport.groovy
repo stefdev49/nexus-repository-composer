@@ -88,9 +88,6 @@ abstract class OrientComposerRecipeSupport
   Provider<StorageFacet> storageFacet
 
   @Inject
-  Provider<ComposerReplicationFacet> replicationFacet
-
-  @Inject
   ExceptionHandler exceptionHandler
 
   @Inject
