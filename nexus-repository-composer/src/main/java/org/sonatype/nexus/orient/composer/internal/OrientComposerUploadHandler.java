@@ -31,6 +31,7 @@ import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.orient.composer.internal.OrientComposerContentFacet;
 import org.sonatype.nexus.orient.composer.internal.OrientComposerContentFacetImpl;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.importtask.ImportFileConfiguration;
 import org.sonatype.nexus.repository.composer.ComposerUploadHandlerSupport;
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
@@ -81,7 +82,7 @@ public class OrientComposerUploadHandler
       for (Entry<String, PartPayload> entry : pathToPayload.entrySet()) {
         String path = entry.getKey();
 
-        Content content = facet.put(path, entry.getValue());
+        Content content = facet.put(path, entry.getValue(), AssetKind.ZIPBALL);
 
         responseContents.add(content);
       }
@@ -97,13 +98,13 @@ public class OrientComposerUploadHandler
     Repository repository = configuration.getRepository();
     String path = configuration.getAssetName();
     Path contentPath = configuration.getFile().toPath();
-
+    log.info("XXX STEF XXX doPut: {} -> {}", path, contentPath);
     try (TempBlob tempBlob = repository.facet(StorageFacet.class).createTempBlob(contentPath,
         OrientComposerContentFacetImpl.HASH_ALGORITHMS, configuration.isHardLinkingEnabled());
          InputStream in = new BufferedInputStream(Files.newInputStream(contentPath, StandardOpenOption.READ))) {
       OrientComposerContentFacet facet = repository.facet(OrientComposerContentFacet.class);
       facet.put(path,
-          new TempBlobPayload(tempBlob, mimeSupport.detectMimeType(in, contentPath.getFileName().toString())));
+          new TempBlobPayload(tempBlob, mimeSupport.detectMimeType(in, contentPath.getFileName().toString())), null, null, null);
       return facet.get(path);
     }
   }

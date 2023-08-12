@@ -18,10 +18,8 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
-import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.view.Content;
@@ -39,9 +37,9 @@ public interface OrientComposerContentFacet
   @Nullable
   Content get(String path) throws IOException;
 
-  Content put(String path, Payload content) throws IOException;
+  Content put(String path, Payload payload, AssetKind assetKind) throws IOException;
 
-  Content put(String path, Content content, AssetKind assetKind) throws IOException;
+  Content put(String path, Payload payload, String sourceType, String sourceUrl, String sourceReference) throws IOException;
 
   /**
    * Accepts an {@link AssetBlob}, creates an {@link Asset} if one doesn't already exist at {@code path},
@@ -60,10 +58,7 @@ public interface OrientComposerContentFacet
    */
   void setCacheInfo(String path, Content content, CacheInfo cacheInfo) throws IOException;
 
-  Asset getOrCreateAsset(final String path,
-                         final String group,
-                         final String name,
-                         final String version);
+  Asset getOrCreateAsset(final String path);
 
   /*
    * Check for the existence of an {@link Asset} with {@code name}.

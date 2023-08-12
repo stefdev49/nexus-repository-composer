@@ -23,10 +23,12 @@ import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerFormatAttributesExtractor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
 import org.sonatype.nexus.repository.composer.internal.ComposerFormat;
+import org.sonatype.nexus.repository.composer.internal.ComposerWritePolicySelector;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.storage.*;
 import org.sonatype.nexus.repository.transaction.TransactionalDeleteBlob;
@@ -66,15 +68,26 @@ public class OrientComposerContentFacetImpl
 {
   public static final List<HashAlgorithm> HASH_ALGORITHMS = ImmutableList.of(MD5, SHA1, SHA256);
 
+  private final Format format;
+  
   private final ComposerFormatAttributesExtractor composerFormatAttributesExtractor;
 
   private final AssetEntityAdapter assetEntityAdapter;
 
   @Inject
-  public OrientComposerContentFacetImpl(final AssetEntityAdapter assetEntityAdapter,
-                                        final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
+  public OrientComposerContentFacetImpl(
+          @Named(ComposerFormat.NAME) final Format format, final AssetEntityAdapter assetEntityAdapter,
+          final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
+    this.format = checkNotNull(format);
     this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
+  }
+
+
+  @Override
+  protected void doInit(final Configuration configuration) throws Exception {
+    super.doInit(configuration);
+    getRepository().facet(StorageFacet.class).registerWritePolicySelector(new ComposerWritePolicySelector());
   }
 
   // TODO: composer does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
@@ -95,40 +108,40 @@ public class OrientComposerContentFacetImpl
     if (asset == null) {
       return null;
     }
+    if (asset.markAsDownloaded()) {
+      tx.saveAsset(asset);
+    }
 
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
     return toContent(asset, blob);
   }
 
   @Override
-  public Content put(final String path, final Payload content) throws IOException {
+  public Content put(String path, Payload payload, AssetKind assetKind) throws IOException {
     StorageFacet storageFacet = facet(StorageFacet.class);
-    try (TempBlob tempBlob = storageFacet.createTempBlob(content, HASH_ALGORITHMS)) {
-      return doPutContent(path, tempBlob, content, AssetKind.ZIPBALL, null, null, null);
-    }
-  }
-
-  @Override
-  public Content put(String path, Content content, AssetKind assetKind) throws IOException {
-    StorageFacet storageFacet = facet(StorageFacet.class);
-    try (TempBlob tempBlob = storageFacet.createTempBlob(content, HASH_ALGORITHMS)) {
+    try (TempBlob tempBlob = storageFacet.createTempBlob(payload, HASH_ALGORITHMS)) {
       switch (assetKind) {
         case ZIPBALL:
-          return doPutContent(path, tempBlob, content, assetKind, null, null, null);
+          return doPutContent(path, tempBlob, payload, assetKind, null, null, null);
         case PACKAGES:
-          return doPutMetadata(path, tempBlob, content, assetKind);
         case PACKAGE:
-          return doPutMetadata(path, tempBlob, content, assetKind);
         case LIST:
-          return doPutMetadata(path, tempBlob, content, assetKind);
         case PROVIDER:
-          return doPutMetadata(path, tempBlob, content, assetKind);
+          return doPutMetadata(path, tempBlob, payload, assetKind);
         default:
           throw new IllegalStateException("Unexpected asset kind: " + assetKind);
       }
     }
   }
 
+  @Override
+  public Content put(final String path, final Payload payload, final String sourceType, final String sourceUrl, final String sourceReference) throws IOException {
+    StorageFacet storageFacet = facet(StorageFacet.class);
+    try (TempBlob tempBlob = storageFacet.createTempBlob(payload, HASH_ALGORITHMS)) {
+      return doPutContent(path, tempBlob, payload, AssetKind.ZIPBALL, sourceType, sourceUrl, sourceReference);
+    }
+  }
+  
   @TransactionalStoreBlob
   protected Content doPutMetadata(final String path,
                                   final TempBlob tempBlob,
@@ -138,8 +151,7 @@ public class OrientComposerContentFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTx();
     log.info("XXX STEF XXX Putting metadata at {}", path);
-    Result result = getResult(path);
-    Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
+    Asset asset = getOrCreateAsset(path);
     asset.formatAttributes().set(P_ASSET_KIND, assetKind.toString());
 
     if (payload instanceof Content) {
@@ -161,12 +173,28 @@ public class OrientComposerContentFacetImpl
   }
 
   @Override
+  @TransactionalStoreMetadata
+  public Asset getOrCreateAsset(final String path) {
+    final StorageTx tx = UnitOfWork.currentTx();
+    final Bucket bucket = tx.findBucket(getRepository());
+
+    Asset asset = findAsset(tx, path);
+    if (asset == null) {
+      asset = tx.createAsset(bucket, format);
+      asset.name(path);
+    }
+
+    asset.markAsDownloaded(AssetManager.DEFAULT_LAST_DOWNLOADED_INTERVAL);
+
+    return asset;
+  }
+
+  @Override
   @TransactionalStoreBlob
   public Asset put(final String path, final AssetBlob assetBlob, @Nullable final AttributesMap contentAttributes) {
     StorageTx tx = UnitOfWork.currentTx();
     log.info("XXX STEF XXX Putting asset at {}", path);
-    Result result = getResult(path);
-    Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
+    Asset asset = getOrCreateAsset(path);
     tx.attachBlob(asset, assetBlob);
     Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
     tx.saveAsset(asset);
@@ -184,14 +212,18 @@ public class OrientComposerContentFacetImpl
       throws IOException
   {
     log.info("XXX STEF XXX Putting content at {}", path);
-    Result result = getResult(path);
+    String[] parts = path.split("/");
+    String vendor = parts[0];
+    String project = parts[1];
+    String version = parts[2];
+
 
     StorageTx tx = UnitOfWork.currentTx();
 
-    Asset asset = getOrCreateAsset(path, result.vendor, result.project, result.version);
+    Asset asset = getOrCreateAsset(path);
 
-    AttributesMap contentAttributes = null;
     if (payload instanceof Content) {
+      AttributesMap contentAttributes = null;
       Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
     }
     AssetBlob assetBlob = tx.setBlob(
@@ -206,9 +238,9 @@ public class OrientComposerContentFacetImpl
     try {
       asset.formatAttributes().clear();
       asset.formatAttributes().set(P_ASSET_KIND, assetKind.toString());
-      asset.formatAttributes().set(P_VENDOR, result.vendor);
-      asset.formatAttributes().set(P_PROJECT, result.project);
-      asset.formatAttributes().set(P_VERSION, result.version);
+      asset.formatAttributes().set(P_VENDOR, vendor);
+      asset.formatAttributes().set(P_PROJECT, project);
+      asset.formatAttributes().set(P_VERSION, version);
       asset.formatAttributes().set(SOURCE_TYPE_FIELD_NAME, sourceType);
       asset.formatAttributes().set(SOURCE_URL_FIELD_NAME, sourceUrl);
       asset.formatAttributes().set(SOURCE_REFERENCE_FIELD_NAME, sourceReference);
@@ -223,75 +255,17 @@ public class OrientComposerContentFacetImpl
     return toContent(asset, assetBlob.getBlob());
   }
 
-  protected static Result getResult(String path) {
-    String[] parts = path.split("/");
-    String vendor = parts[0];
-    String project ;
-    if (parts.length > 1) {
-      project = parts[1];
-    }
-    else {
-      project = vendor;
-    }
-    String version;
-    if (parts.length == 3) {
-      version = parts[2];
-    }
-    else {
-      version = "latest";
-    }
-    return new Result(vendor, project, version);
-  }
-
-  protected static class Result {
-    public final String vendor;
-    public final String project;
-    public final String version;
-
-    public Result(String vendor, String project, String version) {
-      this.vendor = vendor;
-      this.project = project;
-      this.version = version;
-    }
-  }
-
-  @Override
-  @TransactionalStoreMetadata
-  public Asset getOrCreateAsset(final String path,
-                                final String group,
-                                final String name,
-                                final String version) {
-    final StorageTx tx = UnitOfWork.currentTx();
-    final Bucket bucket = tx.findBucket(getRepository());
-
-    Component component = findComponent(tx, group, name, version);
-    if (component == null) {
-      component = tx.createComponent(bucket, getRepository().getFormat()).group(group).name(name).version(version);
-      tx.saveComponent(component);
-    }
-
-    Asset asset = findAsset(tx, path);
-    if (asset == null) {
-      asset = tx.createAsset(bucket, component);
-      asset.name(path);
-    }
-
-    asset.markAsDownloaded(AssetManager.DEFAULT_LAST_DOWNLOADED_INTERVAL);
-
-    return asset;
-  }
-
   @Override
   @TransactionalDeleteBlob
   public boolean delete(final String path) throws IOException {
     StorageTx tx = UnitOfWork.currentTx();
 
-    final Component component = findComponent(tx, path);
-    if (component == null) {
+    final Asset asset = findAsset(tx, path);
+    if (asset == null) {
       return false;
     }
 
-    tx.deleteComponent(component);
+    tx.deleteAsset(asset);
     return true;
   }
 
@@ -328,11 +302,10 @@ public class OrientComposerContentFacetImpl
     }
   }
 
-  // findComponent function by path. split path into group, name, version
-  private Component findComponent(final StorageTx tx, final String path) {
+  @Nullable
+  private Asset findAsset(final StorageTx tx, final String path) {
     log.info("XXX STEF XXX Finding component for path {}", path);
-    Result result = getResult(path);
-    return findComponent(tx, result.vendor, result.project, result.version);
+    return tx.findAssetWithProperty(P_NAME, path, tx.findBucket(getRepository()));
   }
 
   private Component findComponent(final StorageTx tx, final String group, final String name, final String version) {
@@ -346,11 +319,6 @@ public class OrientComposerContentFacetImpl
       return components.iterator().next();
     }
     return null;
-  }
-
-  private Asset findAsset(final StorageTx tx, final String path) {
-    log.info("XXX STEF XXX Finding asset for path {}", path);
-    return tx.findAssetWithProperty(P_NAME, path, tx.findBucket(getRepository()));
   }
 
   private Content toContent(final Asset asset, final Blob blob) {
