@@ -58,7 +58,10 @@ public class OrientComposerHostedFacetImpl
       throws IOException {
     content().put(
         ComposerPathUtils.buildZipballPath(vendor, project, version),
-        payload, sourceType, sourceUrl, sourceUrl
+        payload,
+        sourceType,
+        sourceUrl,
+        sourceReference
     );
   }
 

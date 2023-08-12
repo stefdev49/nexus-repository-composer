@@ -87,6 +87,7 @@ public class OrientComposerContentFacetImpl
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
+    log.info("XXX STEF XXX Initializing orient composer content facet for repository {}", getRepository().getName());
     getRepository().facet(StorageFacet.class).registerWritePolicySelector(new ComposerWritePolicySelector());
   }
 

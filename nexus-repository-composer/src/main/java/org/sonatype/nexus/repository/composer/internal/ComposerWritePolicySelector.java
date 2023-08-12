@@ -23,12 +23,15 @@ import static org.sonatype.nexus.repository.config.WritePolicy.ALLOW_ONCE;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 public class ComposerWritePolicySelector implements WritePolicySelector {
+  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ComposerWritePolicySelector.class);
 
   @Override
   public WritePolicy select(Asset asset, WritePolicy writePolicy) {
+    log.info("XXX STEF XXX ComposerWritePolicySelector.select: asset={}, writePolicy={}", asset, writePolicy);
     if (ALLOW_ONCE == writePolicy) {
       final String assetKind = asset.formatAttributes().get(P_ASSET_KIND, String.class);
-      if (Objects.equals(AssetKind.PROVIDER.name(), assetKind)) {
+      log.info("XXX STEF XXX ComposerWritePolicySelector.select: assetKind={}", assetKind);
+      if (!Objects.equals(AssetKind.ZIPBALL.name(), assetKind)) {
         return ALLOW;
       }
     }

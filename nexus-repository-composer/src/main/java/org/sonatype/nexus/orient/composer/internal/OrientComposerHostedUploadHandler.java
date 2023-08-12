@@ -80,7 +80,7 @@ public class OrientComposerHostedUploadHandler
           payload = readPartStreamToBytePayload(part);
         }
       }
-      log.trace("Upload with source data: {} with url {} and reference {} and data exists: {}",
+      log.info("XXX STEF XXX Upload with source data: {} with url {} and reference {} and data exists: {}",
           sourceType,
           sourceUrl,
           sourceRef,
@@ -88,7 +88,7 @@ public class OrientComposerHostedUploadHandler
       );
     } else {
       payload = checkNotNull(request.getPayload());
-      log.trace("Payload for single file is of type: {} with content type: {}",
+      log.info("XXX STEF XXX Payload for single file is of type: {} with content type: {}",
           payload.getClass().getName(),
           payload.getContentType()
       );
