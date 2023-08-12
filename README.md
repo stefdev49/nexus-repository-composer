@@ -24,3 +24,12 @@ The following features are implemented:
 - rest api to configure composer repositories
 - support for upload package GUI
 - search composer packages
+
+
+## Use
+
+### Upload compsoer packages to hosted repositories
+
+```bash
+curl -u admin:admin123 --upload-file package.zip http://localhost:8081/repository/composer-hosted/
+```
