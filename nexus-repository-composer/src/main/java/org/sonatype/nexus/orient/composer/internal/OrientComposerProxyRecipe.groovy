@@ -16,6 +16,7 @@ package org.sonatype.nexus.orient.composer.internal
 import org.sonatype.nexus.repository.composer.internal.AssetKind
 import org.sonatype.nexus.repository.composer.internal.ComposerContentHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerProviderHandler
+import org.sonatype.nexus.repository.storage.SingleAssetComponentMaintenance
 
 import javax.annotation.Nonnull
 import javax.annotation.Priority
@@ -69,6 +70,9 @@ class OrientComposerProxyRecipe
   Provider<PurgeUnusedFacet> purgeUnusedFacet
 
   @Inject
+  Provider<SingleAssetComponentMaintenance> componentMaintenance
+
+  @Inject
   NegativeCacheHandler negativeCacheHandler
 
   @Inject
@@ -97,6 +101,7 @@ class OrientComposerProxyRecipe
   void apply(final @Nonnull Repository repository) throws Exception {
     super.apply(repository)
     repository.attach(configure(viewFacet.get()))
+    repository.attach(componentMaintenance.get())
     repository.attach(proxyFacet.get())
     repository.attach(httpClientFacet.get())
     repository.attach(negativeCacheFacet.get())

@@ -23,7 +23,6 @@ Ext.define('NX.composer.view.repository.recipe.ComposerHosted', {
   extend: 'NX.coreui.view.repository.RepositorySettingsForm',
   alias: 'widget.nx-coreui-repository-composer-hosted',
   requires: [
-    'NX.coreui.view.repository.facet.ReplicationFacet',
     'NX.coreui.view.repository.facet.StorageFacet',
     'NX.coreui.view.repository.facet.StorageFacetHosted',
     'NX.coreui.view.repository.facet.CleanupPolicyFacet'
@@ -36,7 +35,6 @@ Ext.define('NX.composer.view.repository.recipe.ComposerHosted', {
     var me = this;
 
     me.items = [
-      {xtype: 'nx-coreui-repository-replication-facet'},
       {xtype: 'nx-coreui-repository-storage-facet'},
       {xtype: 'nx-coreui-repository-storage-hosted-facet'},
       {xtype: 'nx-coreui-repository-cleanup-policy-facet'}

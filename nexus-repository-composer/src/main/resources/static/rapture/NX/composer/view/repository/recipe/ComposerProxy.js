@@ -15,7 +15,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 /**
- * Repository settings form for an apt repository
+ * Repository settings form for an composer repository
  *
  * @since 3.17
  */
