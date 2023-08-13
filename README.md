@@ -19,43 +19,21 @@ But due to lack of features and its experimental status, it has been rebooted us
 
 It is a work in progress, currently it supports only orientdb as storage backend.
 The following features are implemented:
+- hosted repositories
 - proxy repositories
 - group repositories
 - rest api to configure composer repositories
 - support for upload package GUI
 - search composer packages
+- reindexing
 
 ## BUGS
 
-- hosted not usable :
-```log
-Using HTTP basic authentication with username "admin"
-Downloading http://localhost:8081/repository/composer-group/packages.json if modified
-[304] http://localhost:8081/repository/composer-group/packages.json
-Downloading http://localhost:8081/repository/composer-proxy/p2/stefdev49/demo.json
-[404] http://localhost:8081/repository/composer-proxy/p2/stefdev49/demo.json
-Downloading http://localhost:8081/repository/composer-proxy/p2/stefdev49/demo~dev.json
-[404] http://localhost:8081/repository/composer-proxy/p2/stefdev49/demo~dev.json
-```
+- enabling write policy selector doesn't work, hosted repositories have to been set to 'Allow redeploy'
 
-Hosted repositroy has to be moved first :
-```log
-Downloading http://localhost:8081/repository/composer-group/packages.json if modified
-[200] http://localhost:8081/repository/composer-group/packages.json
-Writing /home/stef/.cache/composer/repo/http---localhost-8081-repository-composer-group/packages.json into cache
-Downloading http://localhost:8081/repository/composer-hosted/p2/stefdev49/demo.json
-[200] http://localhost:8081/repository/composer-hosted/p2/stefdev49/demo.json
-Writing /home/stef/.cache/composer/repo/http---localhost-8081-repository-composer-group/provider-stefdev49~demo.json into cache
-Reading /home/stef/.cache/composer/repo/http---localhost-8081-repository-composer-group/provider-stefdev49~demo.json from cache
-Reading /home/stef/.cache/composer/repo/http---localhost-8081-repository-composer-group/provider-stefdev49~demo.json from cache
-Downloading http://localhost:8081/repository/composer-hosted/p2/stefdev49/demo~dev.json
-[200] http://localhost:8081/repository/composer-hosted/p2/stefdev49/demo~dev.json
-Writing /home/stef/.cache/composer/repo/http---localhost-8081-repository-composer-group/provider-stefdev49~demo~dev.json into cache
-Reading /home/stef/.cache/composer/repo/http---localhost-8081-repository-composer-group/provider-stefdev49~demo.json from cache
-Reading /home/stef/.cache/composer/repo/http---localhost-8081-repository-composer-group/provider-stefdev49~demo~dev.json from cache
-```
+## Usage
 
-### Upload compsoer packages to hosted repositories
+### Uploading composer packages to hosted repositories
 
 ```bash
 curl -v --user 'user:pass' --upload-file example.zip http://localhost:8081/repository/composer-hosted/packages/upload/vendor/project/version

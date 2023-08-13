@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.content.browse.BrowseFacet
 import org.sonatype.nexus.repository.content.maintenance.SingleAssetMaintenanceFacet
 import org.sonatype.nexus.repository.content.search.SearchFacet
 import org.sonatype.nexus.repository.http.PartialFetchHandler
+import org.sonatype.nexus.repository.search.ElasticSearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
@@ -78,7 +79,7 @@ abstract class OrientComposerRecipeSupport
   Provider<SingleAssetMaintenanceFacet> maintenanceFacet
 
   @Inject
-  Provider<SearchFacet> searchFacet
+  Provider<ElasticSearchFacet> searchFacet
 
   @Inject
   Provider<AttributesFacet> attributesFacet
