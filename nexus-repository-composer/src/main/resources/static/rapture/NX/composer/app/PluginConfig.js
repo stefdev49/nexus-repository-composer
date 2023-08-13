@@ -14,6 +14,7 @@ Ext.define('NX.composer.app.PluginConfig', {
   '@aggregate_priority': 100,
 
   requires: [
+    'NX.coreui.util.RepositoryUrls',
     'NX.composer.app.PluginStrings',
     'NX.composer.util.ComposerRepositoryUrls'
   ],

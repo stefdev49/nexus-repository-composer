@@ -11,15 +11,16 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 Ext.define('NX.composer.util.ComposerRepositoryUrls', {
-  '@aggregate_priority': 90,
+  alias: 'widget.nx-coreui-repository-composer-urls',
 
   singleton: true,
   requires: [
     'NX.coreui.util.RepositoryUrls',
     'NX.util.Url'
-  ]
-}, function(self) {
-  NX.coreui.util.RepositoryUrls.addRepositoryUrlStrategy('composer', function(me, assetModel) {
+  ]},
+
+  function(self) {
+    NX.coreui.util.RepositoryUrls.addRepositoryUrlStrategy('composer', function(me, assetModel) {
     var repositoryName = assetModel.get('repositoryName'), assetName = assetModel.get('name');
     return NX.util.Url.asLink(
         NX.util.Url.baseUrl + '/repository/' + encodeURIComponent(repositoryName) + '/' + encodeURI(assetName),

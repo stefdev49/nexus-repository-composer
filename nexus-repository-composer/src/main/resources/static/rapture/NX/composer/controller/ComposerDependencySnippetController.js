@@ -40,11 +40,9 @@ Ext.define('NX.composer.controller.ComposerDependencySnippetController', {
         displayName: 'Composer',
         description: 'Insert this snippet into your composer.json',
         snippetText:
-            '<dependency>\n' +
-              '  <groupId>' + group + '</groupId>\n' +
-              '  <artifactId>' + name + '</artifactId>\n' +
-              '  <version>' + version + '</version>\n' +
-            '</dependency>'
+          '"require": {\n' +
+              '  "' + group + '/' + name + '": "^' + version + '"\n' +
+          '}',
       }
     ];
   }

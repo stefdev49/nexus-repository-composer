@@ -28,7 +28,6 @@ Ext.define('NX.composer.view.repository.recipe.ComposerGroup', {
    */
   initComponent: function() {
     var me = this;
-
     me.items = [
       {xtype: 'nx-coreui-repository-storage-facet'},
       {xtype: 'nx-coreui-repository-group-facet', format: 'composer' }
