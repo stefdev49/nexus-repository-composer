@@ -24,7 +24,8 @@ import com.google.common.base.Throwables;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.composer.external.ComposerJsonProcessor;
 import org.sonatype.nexus.repository.composer.internal.AssetKind;
-import org.sonatype.nexus.repository.composer.internal.ComposerContentHandler;
+import org.sonatype.nexus.repository.composer.internal.ComposerPackageHandler;
+import org.sonatype.nexus.repository.composer.internal.ComposerProviderHandler;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.*;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
@@ -183,7 +184,7 @@ public class OrientComposerProxyFacet
 
   private Payload getPackagePayload(final Context context, String path) throws Exception {
     Request request = new Request.Builder().action(GET).path(path)
-            .attribute(ComposerContentHandler.DO_NOT_REWRITE, "true").build();
+            .attribute(ComposerProviderHandler.DO_NOT_REWRITE, "true").build();
     Response response = getRepository().facet(ViewFacet.class).dispatch(request, context);
     return response.getPayload();
   }

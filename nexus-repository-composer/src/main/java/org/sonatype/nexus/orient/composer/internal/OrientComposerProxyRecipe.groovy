@@ -14,7 +14,8 @@ package org.sonatype.nexus.orient.composer.internal
 
 
 import org.sonatype.nexus.repository.composer.internal.AssetKind
-import org.sonatype.nexus.repository.composer.internal.ComposerContentHandler
+
+import org.sonatype.nexus.repository.composer.internal.ComposerPackageHandler
 import org.sonatype.nexus.repository.composer.internal.ComposerProviderHandler
 import org.sonatype.nexus.repository.storage.SingleAssetComponentMaintenance
 
@@ -85,7 +86,7 @@ class OrientComposerProxyRecipe
   RoutingRuleHandler routingRuleHandler
 
   @Inject
-  ComposerContentHandler composerContentHandler
+  ComposerPackageHandler composerPackageHandler
 
   @Inject
   ComposerProviderHandler composerProviderHandler
@@ -153,7 +154,6 @@ class OrientComposerProxyRecipe
             .handler(contentHeadersHandler)
             .handler(unitOfWorkHandler)
             .handler(composerProviderHandler)
-            .handler(composerContentHandler)
             .handler(proxyHandler)
             .create())
 
@@ -168,7 +168,7 @@ class OrientComposerProxyRecipe
             .handler(partialFetchHandler)
             .handler(unitOfWorkHandler)
             .handler(contentHeadersHandler)
-            .handler(composerContentHandler)
+            .handler(composerPackageHandler)
             .handler(proxyHandler)
             .create())
 

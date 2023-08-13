@@ -54,7 +54,7 @@ class OrientComposerGroupRecipe
   Provider<GroupFacet> groupFacet
 
   @Inject
-  GroupHandler groupHandler
+  GroupHandler standardGroupHandler
 
   @Inject
   ComposerGroupPackagesJsonHandler packagesJsonHandler
@@ -91,7 +91,6 @@ class OrientComposerGroupRecipe
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
-        .handler(groupHandler)
         .handler(packagesJsonHandler)
         .create())
 
@@ -101,7 +100,6 @@ class OrientComposerGroupRecipe
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
-        .handler(groupHandler)
         .handler(providerJsonHandler)
         .create())
 
@@ -111,7 +109,6 @@ class OrientComposerGroupRecipe
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
-        .handler(groupHandler)
         .handler(packageJsonHandler)
         .create())
 
@@ -121,8 +118,7 @@ class OrientComposerGroupRecipe
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
-        .handler(groupHandler)
-        .handler(packageJsonHandler)
+        .handler(standardGroupHandler)
         .create())
 
 
