@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.composer.internal
 
+import org.sonatype.nexus.repository.search.ElasticSearchFacet
+
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -77,7 +79,7 @@ abstract class ComposerRecipeSupport
   Provider<StorageFacet> storageFacet
 
   @Inject
-  Provider<SearchIndexFacet> searchFacet
+  Provider<ElasticSearchFacet> searchFacet
 
   @Inject
   Provider<AttributesFacet> attributesFacet

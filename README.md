@@ -18,6 +18,7 @@ This repository is a fork of the [Sonatype Nexus Repository Composer Format](htt
 It is ahead of the original repository in terms of following features:
 - rest api to configure composer repositories
 - support for upload package GUI
+- search composer packages is working
 
 PR for these features have been opend to the original repository but not merged yet.
 
