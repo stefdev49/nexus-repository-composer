@@ -80,18 +80,8 @@ public class OrientComposerHostedUploadHandler
           payload = readPartStreamToBytePayload(part);
         }
       }
-      log.info("XXX STEF XXX Upload with source data: {} with url {} and reference {} and data exists: {}",
-          sourceType,
-          sourceUrl,
-          sourceRef,
-          payload != null
-      );
     } else {
       payload = checkNotNull(request.getPayload());
-      log.info("XXX STEF XXX Payload for single file is of type: {} with content type: {}",
-          payload.getClass().getName(),
-          payload.getContentType()
-      );
     }
 
     OrientComposerHostedFacet hostedFacet = repository.facet(OrientComposerHostedFacet.class);

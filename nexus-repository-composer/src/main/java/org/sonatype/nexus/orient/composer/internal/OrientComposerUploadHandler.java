@@ -98,7 +98,7 @@ public class OrientComposerUploadHandler
     Repository repository = configuration.getRepository();
     String path = configuration.getAssetName();
     Path contentPath = configuration.getFile().toPath();
-    log.info("XXX STEF XXX doPut: {} -> {}", path, contentPath);
+
     try (TempBlob tempBlob = repository.facet(StorageFacet.class).createTempBlob(contentPath,
         OrientComposerContentFacetImpl.HASH_ALGORITHMS, configuration.isHardLinkingEnabled());
          InputStream in = new BufferedInputStream(Files.newInputStream(contentPath, StandardOpenOption.READ))) {

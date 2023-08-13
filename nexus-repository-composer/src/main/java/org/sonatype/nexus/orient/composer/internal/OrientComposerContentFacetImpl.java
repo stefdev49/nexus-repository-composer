@@ -81,7 +81,7 @@ public class OrientComposerContentFacetImpl
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
-    log.info("XXX STEF XXX Initializing orient composer content facet for repository {}", getRepository().getName());
+    log.trace("Initializing orient composer content facet for repository {}", getRepository().getName());
     getRepository().facet(StorageFacet.class).registerWritePolicySelector(new ComposerWritePolicySelector());
   }
 
@@ -154,7 +154,6 @@ public class OrientComposerContentFacetImpl
           throws IOException
   {
     StorageTx tx = UnitOfWork.currentTx();
-    log.info("XXX STEF XXX Putting metadata at {}", path);
     Asset asset = getOrCreateAsset(path);
     asset.formatAttributes().set(P_ASSET_KIND, assetKind.toString());
 
@@ -202,7 +201,6 @@ public class OrientComposerContentFacetImpl
                                  final String sourceReference)
       throws IOException
   {
-    log.info("XXX STEF XXX Putting content at {}", path);
     String[] parts = path.split("/");
     String vendor = parts[0];
     String project = parts[1];
@@ -259,7 +257,6 @@ public class OrientComposerContentFacetImpl
     return true;
   }
 
-
   @TransactionalStoreMetadata
   public Asset getOrCreateAsset(final String path,
                                 final String group,
@@ -288,7 +285,6 @@ public class OrientComposerContentFacetImpl
 
   @Nullable
   private Asset findAsset(final StorageTx tx, final String path) {
-    log.info("XXX STEF XXX Finding component for path {}", path);
     return tx.findAssetWithProperty(P_NAME, path, tx.findBucket(getRepository()));
   }
 
