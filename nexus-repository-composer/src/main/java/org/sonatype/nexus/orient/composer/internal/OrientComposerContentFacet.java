@@ -41,14 +41,6 @@ public interface OrientComposerContentFacet
 
   Content put(String path, Payload payload, String sourceType, String sourceUrl, String sourceReference) throws IOException;
 
-  /**
-   * Accepts an {@link AssetBlob}, creates an {@link Asset} if one doesn't already exist at {@code path},
-   * and returns it.
-   *
-   * @since 3.15
-   */
-  Asset put(String path, AssetBlob assetBlob, @Nullable AttributesMap contentAttributes);
-
   boolean delete(String path) throws IOException;
 
   /**
@@ -59,11 +51,4 @@ public interface OrientComposerContentFacet
   void setCacheInfo(String path, Content content, CacheInfo cacheInfo) throws IOException;
 
   Asset getOrCreateAsset(final String path);
-
-  /*
-   * Check for the existence of an {@link Asset} with {@code name}.
-   *
-   * @since 3.15
-   */
-  boolean assetExists(String name);
 }

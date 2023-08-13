@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Format;
@@ -40,7 +39,6 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BlobPayload;
 import org.sonatype.nexus.repository.view.payloads.TempBlob;
-import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.collect.ImmutableList;
@@ -61,7 +59,7 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
  *
  * @since 3.0
  */
-@Named(ComposerFormat.NAME)
+@Named
 public class OrientComposerContentFacetImpl
     extends FacetSupport
     implements OrientComposerContentFacet
@@ -72,31 +70,19 @@ public class OrientComposerContentFacetImpl
   
   private final ComposerFormatAttributesExtractor composerFormatAttributesExtractor;
 
-  private final AssetEntityAdapter assetEntityAdapter;
-
   @Inject
   public OrientComposerContentFacetImpl(
-          @Named(ComposerFormat.NAME) final Format format, final AssetEntityAdapter assetEntityAdapter,
+          @Named(ComposerFormat.NAME) final Format format,
           final ComposerFormatAttributesExtractor composerFormatAttributesExtractor) {
     this.format = checkNotNull(format);
-    this.assetEntityAdapter = checkNotNull(assetEntityAdapter);
     this.composerFormatAttributesExtractor = checkNotNull(composerFormatAttributesExtractor);
   }
-
 
   @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
     log.info("XXX STEF XXX Initializing orient composer content facet for repository {}", getRepository().getName());
     getRepository().facet(StorageFacet.class).registerWritePolicySelector(new ComposerWritePolicySelector());
-  }
-
-  // TODO: composer does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
-  // TODO: as FacetSupport subclass depends on it. Actually, this facet does not need any kind of configuration
-  // TODO: it's here only to circumvent this OSGi/maven-bundle-plugin issue.
-  @Override
-  protected void doValidate(final Configuration configuration) throws Exception {
-    // empty
   }
 
   @Nullable
@@ -142,7 +128,24 @@ public class OrientComposerContentFacetImpl
       return doPutContent(path, tempBlob, payload, AssetKind.ZIPBALL, sourceType, sourceUrl, sourceReference);
     }
   }
-  
+
+  @Override
+  @TransactionalTouchMetadata
+  public void setCacheInfo(final String path, final Content content, final CacheInfo cacheInfo) throws IOException {
+    StorageTx tx = UnitOfWork.currentTx();
+    Bucket bucket = tx.findBucket(getRepository());
+
+    Asset asset = Content.findAsset(tx, bucket, content);
+    if (asset == null) {
+      log.debug("Attempting to set cache info for non-existent composer component {}", path);
+      return;
+    }
+
+    log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
+    tx.saveAsset(asset);
+  }
+
   @TransactionalStoreBlob
   protected Content doPutMetadata(final String path,
                                   final TempBlob tempBlob,
@@ -173,7 +176,6 @@ public class OrientComposerContentFacetImpl
     return toContent(asset, assetBlob.getBlob());
   }
 
-  @Override
   @TransactionalStoreMetadata
   public Asset getOrCreateAsset(final String path) {
     final StorageTx tx = UnitOfWork.currentTx();
@@ -187,18 +189,6 @@ public class OrientComposerContentFacetImpl
 
     asset.markAsDownloaded(AssetManager.DEFAULT_LAST_DOWNLOADED_INTERVAL);
 
-    return asset;
-  }
-
-  @Override
-  @TransactionalStoreBlob
-  public Asset put(final String path, final AssetBlob assetBlob, @Nullable final AttributesMap contentAttributes) {
-    StorageTx tx = UnitOfWork.currentTx();
-    log.info("XXX STEF XXX Putting asset at {}", path);
-    Asset asset = getOrCreateAsset(path);
-    tx.attachBlob(asset, assetBlob);
-    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
-    tx.saveAsset(asset);
     return asset;
   }
 
@@ -221,11 +211,10 @@ public class OrientComposerContentFacetImpl
 
     StorageTx tx = UnitOfWork.currentTx();
 
-    Asset asset = getOrCreateAsset(path);
+    Asset asset = getOrCreateAsset(path, vendor, project, version);
 
     if (payload instanceof Content) {
-      AttributesMap contentAttributes = null;
-      Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+      Content.applyToAsset(asset, Content.maintainLastModified(asset, ((Content) payload).getAttributes()));
     }
     AssetBlob assetBlob = tx.setBlob(
         asset,
@@ -270,37 +259,31 @@ public class OrientComposerContentFacetImpl
     return true;
   }
 
-  @Override
-  @TransactionalTouchMetadata
-  public void setCacheInfo(final String path, final Content content, final CacheInfo cacheInfo) throws IOException {
-    StorageTx tx = UnitOfWork.currentTx();
-    Bucket bucket = tx.findBucket(getRepository());
 
-    // by EntityId
-    Asset asset = Content.findAsset(tx, bucket, content);
+  @TransactionalStoreMetadata
+  public Asset getOrCreateAsset(final String path,
+                                final String group,
+                                final String name,
+                                final String version)
+  {
+    final StorageTx tx = UnitOfWork.currentTx();
+    final Bucket bucket = tx.findBucket(getRepository());
+
+    Component component = findComponent(tx, group, name, version);
+    if (component == null) {
+      component = tx.createComponent(bucket, format).group(group).name(name).version(version);
+      tx.saveComponent(component);
+    }
+
+    Asset asset = findAsset(tx, path);
     if (asset == null) {
-      // by format coordinates
-      Component component = tx.findComponentWithProperty(P_NAME, path, bucket);
-      if (component != null) {
-        asset = tx.firstAsset(component);
-      }
-    }
-    if (asset == null) {
-      log.debug("Attempting to set cache info for non-existent composer component {}", path);
-      return;
+      asset = tx.createAsset(bucket, component);
+      asset.name(path);
     }
 
-    log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
-    CacheInfo.applyToAsset(asset, cacheInfo);
-    tx.saveAsset(asset);
-  }
+    asset.markAsDownloaded();
 
-  @Override
-  @Transactional
-  public boolean assetExists(final String name) {
-    try (StorageTx tx = UnitOfWork.currentTx()) {
-      return assetEntityAdapter.exists(tx.getDb(), name, tx.findBucket(getRepository()));
-    }
+    return asset;
   }
 
   @Nullable
@@ -309,6 +292,7 @@ public class OrientComposerContentFacetImpl
     return tx.findAssetWithProperty(P_NAME, path, tx.findBucket(getRepository()));
   }
 
+  @Nullable
   private Component findComponent(final StorageTx tx, final String group, final String name, final String version) {
     Iterable<Component> components = tx.findComponents(Query.builder()
                     .where(P_GROUP).eq(group)
@@ -327,5 +311,4 @@ public class OrientComposerContentFacetImpl
     Content.extractFromAsset(asset, HASH_ALGORITHMS, content.getAttributes());
     return content;
   }
-
 }
