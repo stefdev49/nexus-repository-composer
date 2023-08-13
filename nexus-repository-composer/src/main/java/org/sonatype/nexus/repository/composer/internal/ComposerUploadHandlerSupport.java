@@ -92,7 +92,7 @@ public abstract class ComposerUploadHandlerSupport
     Map<String,PartPayload> pathToPayload = new LinkedHashMap<>();
 
     for (AssetUpload asset : upload.getAssetUploads()) {
-      String path = normalizePath(vendor + '/' + name + '/' + version + '/' + asset.getFields().get(FILENAME).trim());
+      String path = normalizePath(vendor + '/' + name + '/' + version);
 
       String pathWithPrefix = datastoreEnabled ? prependIfMissing(path, "/") : path;
       ensurePermitted(repository.getName(), ComposerFormat.NAME, pathWithPrefix, emptyMap());
